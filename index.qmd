@@ -1,0 +1,56 @@
+---
+title: "Index"
+---
+![](isa1.jpeg){width=250px}
+![](isagolf.jpg){width=250px}
+
+## About Me
+
+Hi, I'm Isabela Carvajal,  I'm a graduate student in 
+the Business Analytics and Marketing Analytics program at Baruch College, with a Bachelors in International 
+Business and a minor in Fashion Design. 
+
+Professionally, I have experience in:
+
+- Finance 
+- Sales
+- Fashion Design
+
+While I was doing my OPT, I saw the importance of analytics to be more efficient and break down larger data, Which sparked my interest in using data to solve real-world business problems — which is what brought me to this course.
+
+I'm bilingual in Spanish and English, and outside of school my hobby is Golf and fashion.
+
+*I am currently working on my own fashion brand;)*
+
+**I look forward to connecting with everyone in the class!**
+
+[Resume](Isabela_Carvajal_Rios_Resume 2026) | [LinkedIn](https://www.linkedin.com/in/isabelacarvajal)
+
+
+```{r}
+#| include: false
+1+1
+```
+--------------
+Last Updated: `r format(Sys.time(), "%A %m %d, %Y at %H:%M%p")`
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+if(!require("leaflet")){
+    options(repos=c(CRAN="https://cloud.r-project.org"))
+    install.packages("leaflet")
+    stopifnot(require("leaflet"))
+}
+
+baruch_longitude <- -73.98333
+baruch_latitude  <- +40.74028
+
+leaflet() |>
+  addTiles() |>
+  setView(baruch_longitude, baruch_latitude, zoom=17) |>
+  addPopups(baruch_longitude, baruch_latitude, 
+            "I am a Master's student at <b>Baruch College</b>!")
+```
