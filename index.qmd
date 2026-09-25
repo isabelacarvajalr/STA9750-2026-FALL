@@ -24,7 +24,7 @@ I'm bilingual in Spanish and English, and outside of school my hobby is Golf and
 
 **I look forward to connecting with everyone in the class!**
 
-[Resume](resumeisa) | [LinkedIn](https://www.linkedin.com/in/isabelacarvajal)
+[Resume](./resumeisa.pdf) | [LinkedIn](https://www.linkedin.com/in/isabelacarvajal)
 
 
 ```{r}
