@@ -213,9 +213,181 @@ global_by_hours <- NETFLIX_DATA |>
 
 The fraction of Netflix's catalog available globally by title is `r percent(global_by_title, accuracy = 0.1)`. The fraction available globally weighted by hours viewed is `r percent(global_by_hours, accuracy = 0.1)`. This means less than a fourth are available globally and those same titles are the ones that have more than half of the watch time.
 
+###Exploratory Questions (Table answers)
 
+```{r}
+   library(scales)
+   library(gt)
+```
+
+**1. What was the top title (by total hours viewed) in each period and what fraction of total viewership did it capture?**
+
+```{r}
+# Top title per period and its share of that period's total viewing.
+# "Other Shows" is an aggregate bucket, so it is excluded from ranking
+# but kept in the period total.
+top_by_period <- NETFLIX_DATA |>
+  group_by(period) |>
+  mutate(period_total = sum(hours_viewed)) |>
+  filter_out(title == "Other Shows") |>
+  slice_max(hours_viewed, n = 1) |>
+  ungroup() |>
+  mutate(share = hours_viewed / period_total) |>
+  select(period, title, hours_viewed, share)
+
+top_by_period |>
+  gt() |>
+  tab_header(
+    title = "Top Title in Each Reporting Period",
+    subtitle = "WRITE YOUR ONE-LINE TAKEAWAY HERE"
+  ) |>
+  cols_label(
+    period = "Period",
+    title = "Title",
+    hours_viewed = "Hours Viewed",
+    share = "Share of Period Viewing"
+  ) |>
+  fmt_number(hours_viewed, scale_by = 1e-6, decimals = 0, pattern = "{x}M") |>
+  fmt_percent(share, decimals = 1) |>
+  tab_source_note(md("Source: Netflix *What We Watched* reports, 2023H1–2026H1."))
+```
+
+
+
+**2. How has Netflix’s catalog changed in size over the periods for which we have questions? You should consider both the number of titles and the total runtime of content.**
+
+```{r}
+# Catalog size per period: distinct titles, total known runtime (hours),
+# and how many titles lack a runtime so the gap is visible.
+catalog_size <- NETFLIX_DATA |>
+  group_by(period) |>
+  summarize(
+    n_titles = n_distinct(title),
+    total_runtime_hrs = sum(runtime, na.rm = TRUE) / 60,
+    missing_runtime = sum(is.na(runtime))
+  )
+
+catalog_size |>
+  gt() |>
+  tab_header(
+    title = "Netflix Catalog Size by Period",
+    subtitle = "WRITE YOUR TAKEAWAY HERE"
+  ) |>
+  cols_label(
+    period = "Period",
+    n_titles = "Titles",
+    total_runtime_hrs = "Total Runtime (hours)",
+    missing_runtime = "Titles Missing Runtime"
+  ) |>
+  fmt_number(c(n_titles, total_runtime_hrs, missing_runtime), decimals = 0) |>
+  tab_source_note(md("Runtime totals include only titles with a published runtime."))
+```
+
+**3. Which titles have had the most consistently high viewership across all periods? These shows are likely to be ‘staples’ that viewers fall back on as ‘comfort food’, e.g., re-runs of Friends.**
+
+Hint: To answer this question, you might want to compute the average veiwership, the minimum viewership, and the standard deviation of viewership across different periods and develop a filter using some combination of these quantities.
+
+```{r}
+# Staples: titles present in all 7 periods, ranked by their weakest
+# period's hours (a high minimum means viewership never drops off).
+staples <- NETFLIX_DATA |>
+  filter_out(title == "Other Shows") |>
+  group_by(title) |>
+  summarize(
+    n_periods = n_distinct(period),
+    min_hours = min(hours_viewed),
+    avg_hours = mean(hours_viewed)
+  ) |>
+  filter(n_periods == 7) |>
+  slice_max(min_hours, n = 10)
+
+staples |>
+  select(-n_periods) |>
+  gt() |>
+  tab_header(
+    title = "Netflix's Most Consistent 'Comfort Food' Titles",
+    subtitle = "WRITE YOUR TAKEAWAY HERE"
+  ) |>
+  cols_label(
+    title = "Title",
+    min_hours = "Lowest Period (hours)",
+    avg_hours = "Average per Period (hours)"
+  ) |>
+  fmt_number(c(min_hours, avg_hours), scale_by = 1e-6, decimals = 1, pattern = "{x}M") |>
+  tab_source_note(md("Titles appearing in all seven reports, 2023H1–2026H1."))
+```
+
+**4. Within each period, what fraction of time was spent on ‘shows’ vs movies?**
+
+Unfortunately our data does not clearly delineate shows from movies, so you will need to come up with a heuristic for doing so. I’d recommend some combination of:
+
+Length: anything over 4-ish hours is almost certainly a TV show, not a movie
+“Season”: if a title has “Season” in it, it is almost certainly a TV show
+You might think of other filters or thresholds that make sense and can incorporate them into your analysis.
+
+This is a problem that commonly arises in real data analysis: the data is not quite what we might want to answer a question, but we could definitely construct the feature manually if we were willing to put in the effort. In this case, we have to come up with an approximate way of implementing our feature that (roughly) captures our human intuition.11
+
+```{r}
+# Heuristic: runtime over 240 minutes (4 hours) = TV show, otherwise movie.
+# Titles with no runtime can't be classified and are shown separately.
+shows_vs_movies <- NETFLIX_DATA |>
+  mutate(type = case_when(
+    is.na(runtime) ~ "Unclassified",
+    runtime > 240 ~ "TV Show",
+    TRUE ~ "Movie"
+  )) |>
+  group_by(period, type) |>
+  summarize(hours = sum(hours_viewed), .groups = "drop_last") |>
+  mutate(share = hours / sum(hours)) |>
+  ungroup() |>
+  select(-hours) |>
+  pivot_wider(names_from = type, values_from = share)
+
+shows_vs_movies |>
+  gt() |>
+  tab_header(
+    title = "Share of Viewing: TV Shows vs Movies",
+    subtitle = "WRITE YOUR TAKEAWAY HERE"
+  ) |>
+  cols_label(period = "Period") |>
+  fmt_percent(-period, decimals = 1) |>
+  tab_source_note(md("TV show = runtime over 4 hours; titles without a runtime are unclassified."))
+```
+
+**5. How does the performance of live events compare to pre-taped content? Does the average live event draw more viewership than an average piece of pre-taped content? How about a ‘top tier’ live event vs ‘top tier’ pre-taped content?**
+
+```{r}
+# Compare average viewership overall and among each group's top 10%
+# (top 10% is fairer than a fixed top-N since live events are rare).
+live_vs_taped <- NETFLIX_DATA |>
+  filter_out(title == "Other Shows") |>
+  mutate(content_type = if_else(live_event, "Live Event", "Pre-taped")) |>
+  group_by(content_type) |>
+  summarize(
+    n = n(),
+    avg_hours = mean(hours_viewed),
+    top10pct_avg = mean(hours_viewed[hours_viewed >= quantile(hours_viewed, 0.9)])
+  )
+
+live_vs_taped |>
+  gt() |>
+  tab_header(
+    title = "Live Events vs Pre-taped Content",
+    subtitle = "WRITE YOUR TAKEAWAY HERE"
+  ) |>
+  cols_label(
+    content_type = "Content Type",
+    n = "Titles (title-periods)",
+    avg_hours = "Average Hours",
+    top10pct_avg = "Top 10% Average Hours"
+  ) |>
+  fmt_number(n, decimals = 0) |>
+  fmt_number(c(avg_hours, top10pct_avg), scale_by = 1e-6, decimals = 1, pattern = "{x}M")
+```
 
 ### Corporate Strategy Memo
+
+
 Write a brief (no more than 750 words) corporate strategy memo addressed to Netflix leadership. Your memo should help inform Netflix’s original content strategy for 2027 and beyond.
 
 You can use the calculations performed above - or something similar - to include specific numerical evidence in support of your recommendations. For example, you should not say “live events are an increasingly large share of viewership” and should instead prefer a more specific claim like “live events have risen from X% to Y% of total watch time.”
