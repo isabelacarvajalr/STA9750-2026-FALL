@@ -1,6 +1,9 @@
 ---
 title: "Mini-Project #01: What We Watched"
 ---
+### Introduction
+
+### Data Acquisition and Cleaning
 ```{r}
 #' Acquire Netflix What We Watched Reports
 #' 
@@ -101,4 +104,16 @@ rename(title = Title,
 
 NETFLIX_DATA <- load_netflix_data()
 ```
+### Initial Data Exploration
+```{r}
+library(skimr)
+glimpse(NETFLIX_DATA)
+```
 
+```{r}
+skim(NETFLIX_DATA)
+```
+
+After reviewing the data summary, we see we have 11 columns, 61,892 rows that contains a title viewership in a 6 month period, and the columns have the correct type now that we cleaned them. We can also see that we can rely more on the year and hours_viewed because there are no missing cells there, versus runtime (around 21% missing) and views (almost 30% missing), where we have some data missing. We can also see that we can rely on the data from period_start and period_end since there are also no missing values there compared to release_date where we have 35,251 missing cells and only 43% complete. Also, both available_globally and live_event are pretty reliable since only 2 rows are missing in available_globally. Having clarity on the above will help us make sure we are relying on complete data to make our analysis more accurate.
+
+### Exploratory questions
