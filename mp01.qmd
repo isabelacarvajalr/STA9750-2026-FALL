@@ -213,7 +213,7 @@ global_by_hours <- NETFLIX_DATA |>
 
 The fraction of Netflix's catalog available globally by title is `r percent(global_by_title, accuracy = 0.1)`. The fraction available globally weighted by hours viewed is `r percent(global_by_hours, accuracy = 0.1)`. This means less than a fourth are available globally and those same titles are the ones that have more than half of the watch time.
 
-###Exploratory Questions (Table answers)
+### Exploratory Questions (Table answers)
 
 ```{r}
    library(scales)
@@ -234,12 +234,14 @@ top_by_period <- NETFLIX_DATA |>
   ungroup() |>
   mutate(share = hours_viewed / period_total) |>
   select(period, title, hours_viewed, share)
-
+# Average and highest share captured by each period's top title
+avg_top_share <- mean(top_by_period$share)
+max_top_share <- max(top_by_period$share)
 top_by_period |>
   gt() |>
   tab_header(
     title = "Top Title in Each Reporting Period",
-    subtitle = "WRITE YOUR ONE-LINE TAKEAWAY HERE"
+    subtitle = "Top shows but low Share of Period Viewing"
   ) |>
   cols_label(
     period = "Period",
@@ -252,7 +254,7 @@ top_by_period |>
   tab_source_note(md("Source: Netflix *What We Watched* reports, 2023H1–2026H1."))
 ```
 
-
+We can see the top title that appeared the most amount of times during the date period was "Squid Game Season 2" and "Bridgerton" (but 2 different seasons). It is surprising to see even the top titles don't represent more than around `r percent(avg_top_share, accuracy = 0.1)` of Share Period Viewing on average.The title that had the highest Share of Period Viewing overall was Wednesday 2025H2 with `r percent(max_top_share, accuracy = 0.1)`. I also excluded "Other Shows "since it's not a title but a grouped total. 
 
 **2. How has Netflix’s catalog changed in size over the periods for which we have questions? You should consider both the number of titles and the total runtime of content.**
 
@@ -266,12 +268,17 @@ catalog_size <- NETFLIX_DATA |>
     total_runtime_hrs = sum(runtime, na.rm = TRUE) / 60,
     missing_runtime = sum(is.na(runtime))
   )
+# Growth from 2023H2 (first comparable report) to 2026H1
+start <- catalog_size |> filter(period == "2023H2")
+end   <- catalog_size |> filter(period == "2026H1")
 
+title_growth   <- end$n_titles / start$n_titles - 1
+runtime_growth <- end$total_runtime_hrs / start$total_runtime_hrs - 1
 catalog_size |>
   gt() |>
   tab_header(
     title = "Netflix Catalog Size by Period",
-    subtitle = "WRITE YOUR TAKEAWAY HERE"
+    subtitle = "trending up increase aftrer 2023H1"
   ) |>
   cols_label(
     period = "Period",
@@ -283,20 +290,23 @@ catalog_size |>
   tab_source_note(md("Runtime totals include only titles with a published runtime."))
 ```
 
-**3. Which titles have had the most consistently high viewership across all periods? These shows are likely to be ‘staples’ that viewers fall back on as ‘comfort food’, e.g., re-runs of Friends.**
+After reviewing the table above we can see that the period 2023H1 had the most amount of titles but without considering the titles missing Runtime Hours it had also the least Total Runtime Hours. We can also see that from 2023H2 period on, both the Titles and Total Runtime (hours) started increasing slowly but steadily `r percent(title_growth, accuracy = 0.1)` `r percent(runtime_growth, accuracy = 0.1)`. The Titles Missing Runtime for the rest of the Titles from the second period on are also very low so we can consider this data to be more dependable.
 
-Hint: To answer this question, you might want to compute the average veiwership, the minimum viewership, and the standard deviation of viewership across different periods and develop a filter using some combination of these quantities.
+
+**3. Which titles have had the most consistently high viewership across all periods? These shows are likely to be ‘staples’ that viewers fall back on as ‘comfort food’, e.g., re-runs of Friends.**
 
 ```{r}
 # Staples: titles present in all 7 periods, ranked by their weakest
 # period's hours (a high minimum means viewership never drops off).
+# Standard deviation is shown to confirm how stable viewing is.
 staples <- NETFLIX_DATA |>
   filter_out(title == "Other Shows") |>
   group_by(title) |>
   summarize(
     n_periods = n_distinct(period),
     min_hours = min(hours_viewed),
-    avg_hours = mean(hours_viewed)
+    avg_hours = mean(hours_viewed),
+    sd_hours = sd(hours_viewed)
   ) |>
   filter(n_periods == 7) |>
   slice_max(min_hours, n = 10)
@@ -306,16 +316,19 @@ staples |>
   gt() |>
   tab_header(
     title = "Netflix's Most Consistent 'Comfort Food' Titles",
-    subtitle = "WRITE YOUR TAKEAWAY HERE"
+    subtitle = "ADD HERE HEADER"
   ) |>
   cols_label(
     title = "Title",
     min_hours = "Lowest Period (hours)",
-    avg_hours = "Average per Period (hours)"
+    avg_hours = "Average per Period (hours)",
+    sd_hours = "Std. Dev. (hours)"
   ) |>
-  fmt_number(c(min_hours, avg_hours), scale_by = 1e-6, decimals = 1, pattern = "{x}M") |>
+  fmt_number(c(min_hours, avg_hours, sd_hours),
+             scale_by = 1e-6, decimals = 1, pattern = "{x}M") |>
   tab_source_note(md("Titles appearing in all seven reports, 2023H1–2026H1."))
 ```
+
 
 **4. Within each period, what fraction of time was spent on ‘shows’ vs movies?**
 
