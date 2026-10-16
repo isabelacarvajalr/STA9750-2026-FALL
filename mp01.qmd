@@ -3,6 +3,10 @@ title: "Mini-Project #01: What We Watched"
 ---
 ### Introduction
 
+Netflix has been publishing "What We Watched" reports every 6 months since 2023. The data contains the number of hours watched for each title. This data is very useful to get insights and draw conclusions from the information of the past 3 years. This data was released to help advertisers get a sense of the number of people who would see their ads, and help creators get a sense of viewership in order to check they were getting paid accordingly.
+
+In this report I analyzed the 7 reports that are available which contain data between 2023H1 all the way to 2026H1, and gathered information regarding what types of content are watched the most (in hours). I cleaned the data and created tables in order to have a visual on the data and also provided a strategy memo you can find at the bottom. 
+
 ### Data Acquisition and Cleaning
 
 ```{r}
