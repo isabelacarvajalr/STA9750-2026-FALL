@@ -310,13 +310,16 @@ staples <- NETFLIX_DATA |>
   ) |>
   filter(n_periods == 7) |>
   slice_max(min_hours, n = 10)
-
+# Values referenced in the text
+st4      <- staples |> filter(title == "Stranger Things 4")
+escobar  <- staples |> filter(str_detect(title, "Pablo Escobar"))
+heist    <- staples |> filter(str_detect(title, "Money Heist"))
 staples |>
   select(-n_periods) |>
   gt() |>
   tab_header(
     title = "Netflix's Most Consistent 'Comfort Food' Titles",
-    subtitle = "ADD HERE HEADER"
+    subtitle = "Users Go To's"
   ) |>
   cols_label(
     title = "Title",
@@ -329,16 +332,9 @@ staples |>
   tab_source_note(md("Titles appearing in all seven reports, 2023H1–2026H1."))
 ```
 
+To create the table and define what is considered a "Comfort Food", I used the Titles that appeared in all 7 reports, and they are ranked by the lowest period to avoid the average being pushed up by temporary spikes. After checking the table above, we can see that both "Pablo Escobar, el patron del mal: Season 1" and "Chiquititas (2013)" have the highest Lowest Period since they are both over 105M hours. The highest overall Average per Period was "Stranger Things 4" by far with `r number(st4$avg_hours, scale = 1e-6, accuracy = 0.1, suffix = "M")` hours. This is a considerable difference compared to the other Titles, and the second Title with the highest overall Average per Period was "Pablo Escobar, el patron del mal: Season 1" with 	`r number(escobar$avg_hours, scale = 1e-6, accuracy = 0.1, suffix = "M")` hours. But this doesn't necessarily mean they are the top "comfort food shows" since we see other shows pop up multiple times just different seasons. For example: "Breaking Bad" Season 2, 3, and 5, meaning users came back to see a show that was released many years or seasons ago and still decide to spend their time watching it consistently over watching new shows. On the other hand, when we check how viewing behavior changes between periods (Standard Deviation(hours)), we can see the Title with the highest volatility is also "Stranger Things 4", which means even if it has the highest average within this top 10 Titles, it is not steady and it was just a big hit during a short period of time compared to the other shows. The Title with the lowest Standard Deviation (`r number(heist$sd_hours, scale = 1e-6, accuracy = 0.1, suffix = "M")`) was also the Title with the lowest Average per Period: "Money Heist: Part 1" with `r number(heist$avg_hours, scale = 1e-6, accuracy = 0.1, suffix = "M")` hours. This tells us even if it is at the bottom of the top 10 Titles, people watch it consistently and go to it as a trusted "Comfort Food Show".
 
 **4. Within each period, what fraction of time was spent on ‘shows’ vs movies?**
-
-Unfortunately our data does not clearly delineate shows from movies, so you will need to come up with a heuristic for doing so. I’d recommend some combination of:
-
-Length: anything over 4-ish hours is almost certainly a TV show, not a movie
-“Season”: if a title has “Season” in it, it is almost certainly a TV show
-You might think of other filters or thresholds that make sense and can incorporate them into your analysis.
-
-This is a problem that commonly arises in real data analysis: the data is not quite what we might want to answer a question, but we could definitely construct the feature manually if we were willing to put in the effort. In this case, we have to come up with an approximate way of implementing our feature that (roughly) captures our human intuition.11
 
 ```{r}
 # Heuristic: runtime over 240 minutes (4 hours) = TV show, otherwise movie.
@@ -356,19 +352,43 @@ shows_vs_movies <- NETFLIX_DATA |>
   select(-hours) |>
   pivot_wider(names_from = type, values_from = share)
 
+# Values referenced in the text.
+# 2023H2 onward is used for averages because 2023H1 is missing most runtimes.
+later <- shows_vs_movies |> filter(period != "2023H1")
+first <- shows_vs_movies |> filter(period == "2023H1")
+
+avg_tv_share    <- mean(later$`TV Show`)
+avg_movie_share <- mean(later$Movie)
+min_tv_share    <- min(later$`TV Show`)
+max_tv_share    <- max(later$`TV Show`)
+
+unclassified_2023h1 <- first$Unclassified
+movie_2023h1        <- first$Movie
+
+# Share of 2023H1 titles with no runtime (uses catalog_size from Q2)
+missing_share_2023h1 <- with(catalog_size |> filter(period == "2023H1"),
+                             missing_runtime / n_titles)
+
+# Table
 shows_vs_movies |>
   gt() |>
   tab_header(
     title = "Share of Viewing: TV Shows vs Movies",
-    subtitle = "WRITE YOUR TAKEAWAY HERE"
+    subtitle = "Shows win"
   ) |>
   cols_label(period = "Period") |>
   fmt_percent(-period, decimals = 1) |>
   tab_source_note(md("TV show = runtime over 4 hours; titles without a runtime are unclassified."))
 ```
 
-**5. How does the performance of live events compare to pre-taped content? Does the average live event draw more viewership than an average piece of pre-taped content? How about a ‘top tier’ live event vs ‘top tier’ pre-taped content?**
+To solve this question, I classified the titles as TV show if its runtime was over 4 hours, otherwise it is considered a movie. The titles that we have no runtime data of are considered "Unclassified" in order to check if there is a high number of Unclassified titles and make more accurate assumptions. This is a good way to organize the data because the runtime is available for most of the titles after 2023H1. 
 
+I encountered a small limiting issue where short miniseries that are under 4 hours might be mixed in with the movies, and movies over 4 hours mixed in with shows, but this is very uncommon.
+
+The analysis tells us that from 2023H2 on TV shows take between `r percent(min_tv_share, accuracy = 0.1)` and `r percent(max_tv_share, accuracy = 0.1)` of the hours viewed vs movies only `r percent(avg_movie_share, accuracy = 0.1)`. We can conclude this is stable since between years 2023 and 2026 there is not much fluctuation as seen in the table above. I am not using 2023H1 in this analysis since there is about `r percent(unclassified_2023h1, accuracy = 0.1)` of the share of viewing hours that is unclassified. But given the trend we could potentially assume since movies are still `r percent(movie_2023h1, accuracy = 0.1)`, about the same as the later average (`r percent(avg_movie_share, accuracy = 0.1)`), the unclassified data would be mostly shows.
+
+
+**5. How does the performance of live events compare to pre-taped content? Does the average live event draw more viewership than an average piece of pre-taped content? How about a ‘top tier’ live event vs ‘top tier’ pre-taped content?**
 ```{r}
 # Compare average viewership overall and among each group's top 10%
 # (top 10% is fairer than a fixed top-N since live events are rare).
@@ -382,11 +402,20 @@ live_vs_taped <- NETFLIX_DATA |>
     top10pct_avg = mean(hours_viewed[hours_viewed >= quantile(hours_viewed, 0.9)])
   )
 
+# Values referenced in the text
+live  <- live_vs_taped |> filter(content_type == "Live Event")
+taped <- live_vs_taped |> filter(content_type == "Pre-taped")
+
+gap_avg    <- taped$avg_hours / live$avg_hours          # how many times larger
+gap_top    <- taped$top10pct_avg / live$top10pct_avg
+live_share <- live$n / (live$n + taped$n)               # live events' share of rows
+
+# Table
 live_vs_taped |>
   gt() |>
   tab_header(
     title = "Live Events vs Pre-taped Content",
-    subtitle = "WRITE YOUR TAKEAWAY HERE"
+    subtitle = "Pre-Taped have the advantage"
   ) |>
   cols_label(
     content_type = "Content Type",
@@ -395,8 +424,13 @@ live_vs_taped |>
     top10pct_avg = "Top 10% Average Hours"
   ) |>
   fmt_number(n, decimals = 0) |>
-  fmt_number(c(avg_hours, top10pct_avg), scale_by = 1e-6, decimals = 1, pattern = "{x}M")
+  fmt_number(c(avg_hours, top10pct_avg),
+             scale_by = 1e-6, decimals = 1, pattern = "{x}M")
 ```
+
+When analyzing Live Events vs Pre-Taped Content, I compared the average hours per title, the overall, and the top 10% of each group. The top 10% is much more fair compared to a fixed top 10 because there are only `r comma(live$n)` live events vs `r comma(taped$n)` Pre-Taped.
+
+I found Pre-Taped content wins Live Events in both categories: Average Hours by `r number(gap_avg, accuracy = 0.1, suffix = " times")` and top 10% average hours by `r number(gap_top, accuracy = 0.1, suffix = " times")`. This number difference gets bigger as you move from Average Hours to the top 10% Average Hours, meaning Pre-Taped has a lot more hours It is important to point out there are very few Live Events, so this analysis is being based on that small sample. Also the hour length the events last makes a difference since short events are in the same category as multiple hour long events or seasons, so that makes Live Events look like they have a smaller viewer audience.
 
 ### Corporate Strategy Memo
 
