@@ -501,7 +501,48 @@ gini_views_latest <- gini_by_period |> filter(period == "2026H1") |> pull(gini_v
 
 ### Corporate Strategy Memo
 
-WRITE YOUR MEMO HERE
+**To:** Netflix Leadership
+**From:** Isabela Carvajal Rios
+**Date:** October 16, 2026
+**Subject:** [your title]
+
+##### Summary
+This memo analyzed Netflix's “What We Watched” reports, between the periods 2023–2026. The key takeaways are:
+- Series took most of the watch time vs movies
+- The global originals perform very well but the share of watch time is going down compared to the past
+- The majority of the watch time comes from the broad title catalog and not the top hits.
+
+In year 2027 Netflix should continue to grow and invest in their broad title catalog while keeping the originals and "Comfort Food" shows. They should also invest in TV shows like series or multi season franchises, and finally they should add more regional originals.
+
+##### Global Originals
+The global titles are a small part of the catalog representing only `r percent(global_by_title, accuracy = 0.1)` of titles. But at the same time they represent more than half of the watch time with `r percent(global_by_hours, accuracy = 0.1)` of viewing hours.
+
+However, their share of watch time has dropped from `r percent(global_start, accuracy = 0.1)` in 2023H2 to `r percent(global_end, accuracy = 0.1)` in 2026H1.
+
+This means while global titles are still going strong even if a fraction of the watch time fell, regionally available titles are taking a bigger share: `r percent(1 - global_start, accuracy = 0.1)` → `r percent(1 - global_end, accuracy = 0.1)`. To stay ahead, Netflix should keep investing in global originals while adding more regional ones.
+
+##### TV Series vs Movies
+The data shows that TV Shows are responsible for most of the watch time and it also grew slightly: `r percent(tv_start, accuracy = 0.1)` in 2023H2 to `r percent(tv_end, accuracy = 0.1)` in 2026H1. On the other hand movies are responsible for a small but steady share: `r percent(avg_movie_share, accuracy = 0.1)` on average. It is important to point out that every #1 title in every period was a series and not a movie.
+
+Netflix should focus its budget for the coming year on series and multi season franchises vs movies since the data is clear that TV Shows are the ones being watched the most hours by the subscribers.
+
+##### Big Hits vs the Long Tail
+The Gini coefficient is a score that ranges between 0% and 100% to show how evenly something is divided (in this case, among titles). The closer the score is to 0% the more equally titles share the viewing, while 100% means one single title gets all the viewing.
+
+Netflix's Gini shows subscribers' viewings are highly concentrated since it had a score of `r percent(gini_hours_latest, accuracy = 0.1)` in 2026H1 based on the hours viewed. And even after being adjusted for length to make sure it is fair between long shows and short shows, the Gini is still `r percent(gini_views_latest, accuracy = 0.1)` when measured by views. This has stayed very consistent since 2023H2 as can be seen in the chart below. 
+
+Even though the viewing is concentrated, the data shows the top 10 titles take a very small fraction of watch time in 2026H1: `r percent(top10_share, accuracy = 0.1)`. So the majority of the watch time is spread among the rest of the title catalog.
+
+This gives an important insight to Netflix that they need to keep a broad catalog of titles and not only rely on the top hits. 
+
+##### Recommendations for 2027
+- Prioritize series over movies, since we can see TV shows can account for `r percent(avg_tv_share, accuracy = 0.1)` of hours vs `r percent(avg_movie_share, accuracy = 0.1)` for movies.
+
+- Keep the "Comfort Food" licenses and renew them since these shows are being continuously watched by the subscribers and have a steady engagement even if they came out many periods ago. A few examples are: "Breaking Bad" and "Suits".
+
+- Continue investing in the creation of multi season franchises because the data tells us shows like "Bridgerton", "Wednesday", and "Squid Game" are #1 hits and there are returning viewers.
+
+- Keep the broad range of titles and keep investing in having a full content library since the data shows the top 10 titles are only `r percent(top10_share, accuracy = 0.1)` of viewing, and most of the watch time is distributed among smaller titles. 
 
 ```{r}
 # Visual: how concentrated viewing is, by period
@@ -516,7 +557,7 @@ gini_by_period |>
   scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
   labs(
     title = "Netflix Viewing Is Highly Concentrated",
-    subtitle = "WRITE YOUR CHART TAKEAWAY HERE",
+    subtitle = "Gini steady at 75% since 2023H2",
     x = "Reporting period",
     y = "Gini coefficient",
     color = NULL,
