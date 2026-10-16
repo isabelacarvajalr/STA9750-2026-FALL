@@ -501,13 +501,10 @@ gini_views_latest <- gini_by_period |> filter(period == "2026H1") |> pull(gini_v
 
 ### Corporate Strategy Memo
 
-**To:** Netflix Leadership
-
-**From:** Isabela Carvajal Rios
-
-**Date:** October 16, 2026
-
-**Subject:** Insights for 2027
+**To:** Netflix Leadership\
+**From:** Isabela Carvajal Rios\
+**Date:** October 16, 2026\
+**Subject:** Insights for 2027\
 
 ##### Summary
 This memo analyzed Netflix's “What We Watched” reports, between the periods 2023–2026. The key takeaways are:
