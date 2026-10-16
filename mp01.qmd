@@ -452,7 +452,79 @@ When analyzing Live Events vs Pre-Taped Content, I compared the average hours pe
 
 I found Pre-Taped content wins Live Events in both categories: Average Hours by `r number(gap_avg, accuracy = 0.1, suffix = " times")` and top 10% average hours by `r number(gap_top, accuracy = 0.1, suffix = " times")`. This number difference gets bigger as you move from Average Hours to the top 10% Average Hours, meaning Pre-Taped has a lot more hours. It is important to point out there are very few Live Events, so this analysis is being based on that small sample. Also the hour length the events last makes a difference since short events are in the same category as multiple hour long events or seasons, so that makes Live Events look like they have a smaller viewer audience.
 
+### Memo Supporting Calculations
+
+```{r}
+# ---- Trends over time (2023H2 = first comparable period) ----
+# Global titles' share of viewing hours in each period
+global_trend <- NETFLIX_DATA |>
+  group_by(period) |>
+  summarize(global_share = sum(hours_viewed[available_globally], na.rm = TRUE) /
+                           sum(hours_viewed))
+
+global_start <- global_trend |> filter(period == "2023H2") |> pull(global_share)
+global_end   <- global_trend |> filter(period == "2026H1") |> pull(global_share)
+
+# TV share of viewing, first comparable period vs latest
+tv_start <- shows_vs_movies |> filter(period == "2023H2") |> pull(`TV Show`)
+tv_end   <- shows_vs_movies |> filter(period == "2026H1") |> pull(`TV Show`)
+
+# Share of viewing captured by the top title, first comparable vs latest
+top_start <- top_by_period |> filter(period == "2023H2") |> pull(share)
+top_end   <- top_by_period |> filter(period == "2026H1") |> pull(share)
+
+# ---- Gini coefficient ----
+# 0 = viewing spread evenly across titles; 1 = all viewing in a single title
+gini <- function(y) {
+  y <- sort(y)
+  n <- length(y)
+  2 * sum(seq_len(n) * y) / (n * sum(y)) - (n + 1) / n
+}
+
+# Formula check on a known example (expected result: about 0.555)
+gini_check <- gini(c(20, 200, 0, 50, 40))
+
+# Gini per period on raw hours and on views (length-adjusted).
+# 2023H1 excluded: it lacks views and is formatted differently.
+gini_by_period <- NETFLIX_DATA |>
+  filter_out(title == "Other Shows") |>
+  filter(period != "2023H1") |>
+  group_by(period) |>
+  summarize(
+    gini_hours = gini(hours_viewed),
+    gini_views = gini(views[!is.na(views)])
+  )
+
+gini_hours_latest <- gini_by_period |> filter(period == "2026H1") |> pull(gini_hours)
+gini_views_latest <- gini_by_period |> filter(period == "2026H1") |> pull(gini_views)
+```
+
 ### Corporate Strategy Memo
+
+WRITE YOUR MEMO HERE
+
+```{r}
+# Visual: how concentrated viewing is, by period
+gini_by_period |>
+  pivot_longer(c(gini_hours, gini_views),
+               names_to = "measure", values_to = "gini") |>
+  mutate(measure = if_else(measure == "gini_hours",
+                           "Hours viewed", "Views (length-adjusted)")) |>
+  ggplot(aes(x = period, y = gini, color = measure, group = measure)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2.5) +
+  scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+  labs(
+    title = "Netflix Viewing Is Highly Concentrated",
+    subtitle = "WRITE YOUR CHART TAKEAWAY HERE",
+    x = "Reporting period",
+    y = "Gini coefficient",
+    color = NULL,
+    caption = "Source: Netflix What We Watched reports. 'Other Shows' excluded."
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom")
+```
 
 
 ### AI Usage Statement
