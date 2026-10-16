@@ -439,20 +439,6 @@ I found Pre-Taped content wins Live Events in both categories: Average Hours by 
 ### Corporate Strategy Memo
 
 
-Write a brief (no more than 750 words) corporate strategy memo addressed to Netflix leadership. Your memo should help inform Netflix’s original content strategy for 2027 and beyond.
-
-You can use the calculations performed above - or something similar - to include specific numerical evidence in support of your recommendations. For example, you should not say “live events are an increasingly large share of viewership” and should instead prefer a more specific claim like “live events have risen from X% to Y% of total watch time.”
-
-Your memo should touch on at least 2 of the following possible topics:
-
-Globally available vs. regionally licensed content
-TV shows vs. movies
-‘Big hits’ vs. the long-tail of smaller titles
-Shorter ‘bite sized’ vs. longer content
-‘Burstiness’ of viewership: do titles have a rush of viewership immediately after release (to partially answer this, you can use the period end and release date columns to get a “days available” value; combine this with a focus on titles that release near a period end)
-Trends over time: identify time changes in the data, don’t simply aggregate 2023 to the present.
-You may also address other structure or trends in the data you find interesting.
-
 ## AI Usage Statement
 
 ::: {.callout-note title="AI Usage Statement" collapse="true"}
