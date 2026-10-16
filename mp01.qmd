@@ -1,6 +1,19 @@
 ---
 title: "Mini-Project #01: What We Watched"
+author: "Isabela Carvajal Rios"
+format:
+  html:
+    toc: true
+    toc-depth: 4
+    toc-title: "Contents"
+    code-fold: true
+    code-summary: "Show code"
+    code-tools: true
+execute:
+  warning: false
+  message: false
 ---
+
 ### Introduction
 
 Netflix has been publishing "What We Watched" reports every 6 months since 2023. The data contains the number of hours watched for each title. This data is very useful to get insights and draw conclusions from the information of the past 3 years. This data was released to help advertisers get a sense of the number of people who would see their ads, and help creators get a sense of viewership in order to check they were getting paid accordingly.
@@ -83,32 +96,33 @@ load_netflix_data <- function(){
            Title = str_remove(Title, "[^[:ascii:]].*"), 
            Title = str_trim(Title)) |>
     filter_out(Title == "") |>
-    select(year, 
-           period, 
-           period_start, 
-           period_end, 
-           Title, 
-           -half, 
-           Runtime, 
-           Views, 
-           `Hours Viewed`, 
+    select(year,
+           period,
+           period_start,
+           period_end,
+           Title,
+           -half,
+           Runtime,
+           Views,
+           `Hours Viewed`,
            `Release Date`,
-           `Available Globally?`, 
-           live_event)|>
-rename(title = Title,
-       runtime = Runtime,
-       views = Views,
-       hours_viewed = `Hours Viewed`,
-       release_date = `Release Date`,
-       available_globally =  `Available Globally?`)|>
-  mutate(
-    year = as.integer(year),
-    available_globally =available_globally == "Yes"
-  )
+           `Available Globally?`,
+           live_event) |>
+    rename(title = Title,
+           runtime = Runtime,
+           views = Views,
+           hours_viewed = `Hours Viewed`,
+           release_date = `Release Date`,
+           available_globally = `Available Globally?`) |>
+    mutate(
+      year = as.integer(year),
+      available_globally = available_globally == "Yes"
+    )
 }
 
 NETFLIX_DATA <- load_netflix_data()
 ```
+
 ### Initial Data Exploration
 
 ```{r}
@@ -120,6 +134,8 @@ glimpse(NETFLIX_DATA)
 skim(NETFLIX_DATA)
 ```
 
+
+
 After reviewing the data summary, we see we have 11 columns, 61,892 rows that contains a title viewership in a 6 month period, and the columns have the correct type now that we cleaned them. We can also see that we can rely more on the `year` and `hours_viewed` because there are no missing cells there, versus `runtime` (around 21% missing) and `views` (almost 30% missing), where we have some data missing. We can also see that we can rely on the data from `period_start` and `period_end` since there are also no missing values there compared to `release_date` where we have 35,251 missing cells and only 43% complete. Also, both `available_globally` and `live_event` are pretty reliable since only 2 rows are missing in `available_globally`. Having clarity on the above will help us make sure we are relying on complete data to make our analysis more accurate.
 
 ### Exploratory questions
@@ -128,7 +144,7 @@ After reviewing the data summary, we see we have 11 columns, 61,892 rows that co
 library(scales)
 ```
 
-**1. What date range is covered by this data set?**
+###### 1. What date range is covered by this data set?
 
 ```{r}
 #Date range
@@ -137,9 +153,9 @@ last_date  <- max(NETFLIX_DATA$period_end)
 
 ```
 
-The date range goes from `r first_date` until `r last_date`. 
+The date range goes from `r first_date` until `r last_date`.
 
-**2. How many different shows and movies are covered in this data set?**
+###### 2. How many different shows and movies are covered in this data set?
 
 ```{r}
 
@@ -150,7 +166,7 @@ n_titles <- n_distinct(NETFLIX_DATA$title)
 
 There are `r comma(n_titles)` shows and movies covered in this data.
 
-**3. How many total hours have been spent watching shows from the Bridgerton universe?**
+###### 3. How many total hours have been spent watching shows from the Bridgerton universe?
 
 ```{r}
 bridgerton_hours <- NETFLIX_DATA |>
@@ -161,7 +177,7 @@ bridgerton_hours <- NETFLIX_DATA |>
 
 There have been `r comma(bridgerton_hours)` hours watched of Bridgerton universe during the date range described in the answer above for question number 1. 
 
-**4. How many total hours have been spent watching the five seasons of Stranger Things? For this question, we only want the “real” Stranger Things shows and not the companion behind-the-scenes show (“Beyond Stranger Things”), the animated spin-off (“Tales from ’85”), or the background music (“Stranger Things: Fireplace”).**
+###### 4. How many total hours have been spent watching the five seasons of Stranger Things? For this question, we only want the “real” Stranger Things shows and not the companion behind-the-scenes show (“Beyond Stranger Things”), the animated spin-off (“Tales from ’85”), or the background music (“Stranger Things: Fireplace”).
 
 ```{r}
 stranger_hours <- NETFLIX_DATA |>
@@ -175,7 +191,7 @@ stranger_hours <- NETFLIX_DATA |>
 
 The total amount of hours spent watching Stranger Things seasons 1 to 5 without including Beyond Stranger Things, Tales from ’85, and Stranger Things: Fireplace is `r comma(stranger_hours)`.
 
-**5. What percentage of total watch time was spent on the Top 10 titles of 2026H1?**
+###### 5. What percentage of total watch time was spent on the Top 10 titles of 2026H1?
 
 ```{r}
 #share of 2026H1 watch time captured by the Top 10 titles
@@ -197,7 +213,7 @@ top10_share <- top10_2026 / total_2026
 
 The percentage of total watch time spent on the top 10 titles of 2026H1 was `r percent(top10_share, accuracy = 0.1)`.
 
-**6. What fraction of Netflix’s catalog is globally available? (Answer this both by title and weighted by hours viewed)**
+###### 6. What fraction of Netflix’s catalog is globally available? (Answer this both by title and weighted by hours viewed)
 
 ```{r}
 # Share of the catalog that is globally available
@@ -220,11 +236,10 @@ The fraction of Netflix's catalog available globally by title is `r percent(glob
 ### Exploratory Questions (Table answers)
 
 ```{r}
-   library(scales)
-   library(gt)
+library(gt)
 ```
 
-**1. What was the top title (by total hours viewed) in each period and what fraction of total viewership did it capture?**
+###### 1. What was the top title (by total hours viewed) in each period and what fraction of total viewership did it capture?
 
 ```{r}
 # Top title per period and its share of that period's total viewing.
@@ -258,9 +273,9 @@ top_by_period |>
   tab_source_note(md("Source: Netflix *What We Watched* reports, 2023H1–2026H1."))
 ```
 
-We can see the top title that appeared the most amount of times during the date period was "Squid Game Season 2" and "Bridgerton" (but 2 different seasons). It is surprising to see even the top titles don't represent more than around `r percent(avg_top_share, accuracy = 0.1)` of Share Period Viewing on average.The title that had the highest Share of Period Viewing overall was Wednesday 2025H2 with `r percent(max_top_share, accuracy = 0.1)`. I also excluded "Other Shows "since it's not a title but a grouped total. 
+We can see the top titles that appeared the most amount of times during the date period were "Squid Game Season 2" and "Bridgerton" (but 2 different seasons). It is surprising to see even the top titles only represent around `r percent(avg_top_share, accuracy = 0.1)` of Share of Period Viewing on average. The title that had the highest share of period viewing overall was "Wednesday: Season 2" in 2025H2 with `r percent(max_top_share, accuracy = 0.1)`. I also excluded "Other Shows" since it's not a title but a grouped total. 
 
-**2. How has Netflix’s catalog changed in size over the periods for which we have questions? You should consider both the number of titles and the total runtime of content.**
+###### 2. How has Netflix’s catalog changed in size over the periods for which we have questions? You should consider both the number of titles and the total runtime of content.
 
 ```{r}
 # Catalog size per period: distinct titles, total known runtime (hours),
@@ -282,7 +297,7 @@ catalog_size |>
   gt() |>
   tab_header(
     title = "Netflix Catalog Size by Period",
-    subtitle = "trending up increase aftrer 2023H1"
+    subtitle = "trending up increase after 2023H1"
   ) |>
   cols_label(
     period = "Period",
@@ -294,10 +309,10 @@ catalog_size |>
   tab_source_note(md("Runtime totals include only titles with a published runtime."))
 ```
 
-After reviewing the table above we can see that the period 2023H1 had the most amount of titles but without considering the titles missing Runtime Hours it had also the least Total Runtime Hours. We can also see that from 2023H2 period on, both the Titles and Total Runtime (hours) started increasing slowly but steadily `r percent(title_growth, accuracy = 0.1)` `r percent(runtime_growth, accuracy = 0.1)`. The Titles Missing Runtime for the rest of the Titles from the second period on are also very low so we can consider this data to be more dependable.
+After reviewing the table above we can see that the period 2023H1 had the most amount of titles, the highest amount of Titles Missing Runtime, and at the same time the least amount of Total Runtime (hours), which can be attributed as to why the Total Runtime is so low compared to other periods. We can also see that from 2023H2 period on, both the Titles and Total Runtime (hours) started increasing slowly but steadily with the number of Titles growing by `r percent(title_growth, accuracy = 0.1)` and Total Runtime growing by `r percent(runtime_growth, accuracy = 0.1)` between 2023H2 and 2026H1. The Titles Missing Runtime for the rest of the Titles from the second period on are also very low so we can consider this data to be more dependable.
 
 
-**3. Which titles have had the most consistently high viewership across all periods? These shows are likely to be ‘staples’ that viewers fall back on as ‘comfort food’, e.g., re-runs of Friends.**
+###### 3. Which titles have had the most consistently high viewership across all periods? These shows are likely to be ‘staples’ that viewers fall back on as ‘comfort food’, e.g., re-runs of Friends.
 
 ```{r}
 # Staples: titles present in all 7 periods, ranked by their weakest
@@ -323,7 +338,7 @@ staples |>
   gt() |>
   tab_header(
     title = "Netflix's Most Consistent 'Comfort Food' Titles",
-    subtitle = "Users Go To's"
+    subtitle = "Users Go To"
   ) |>
   cols_label(
     title = "Title",
@@ -336,9 +351,9 @@ staples |>
   tab_source_note(md("Titles appearing in all seven reports, 2023H1–2026H1."))
 ```
 
-To create the table and define what is considered a "Comfort Food", I used the Titles that appeared in all 7 reports, and they are ranked by the lowest period to avoid the average being pushed up by temporary spikes. After checking the table above, we can see that both "Pablo Escobar, el patron del mal: Season 1" and "Chiquititas (2013)" have the highest Lowest Period since they are both over 105M hours. The highest overall Average per Period was "Stranger Things 4" by far with `r number(st4$avg_hours, scale = 1e-6, accuracy = 0.1, suffix = "M")` hours. This is a considerable difference compared to the other Titles, and the second Title with the highest overall Average per Period was "Pablo Escobar, el patron del mal: Season 1" with 	`r number(escobar$avg_hours, scale = 1e-6, accuracy = 0.1, suffix = "M")` hours. But this doesn't necessarily mean they are the top "comfort food shows" since we see other shows pop up multiple times just different seasons. For example: "Breaking Bad" Season 2, 3, and 5, meaning users came back to see a show that was released many years or seasons ago and still decide to spend their time watching it consistently over watching new shows. On the other hand, when we check how viewing behavior changes between periods (Standard Deviation(hours)), we can see the Title with the highest volatility is also "Stranger Things 4", which means even if it has the highest average within this top 10 Titles, it is not steady and it was just a big hit during a short period of time compared to the other shows. The Title with the lowest Standard Deviation (`r number(heist$sd_hours, scale = 1e-6, accuracy = 0.1, suffix = "M")`) was also the Title with the lowest Average per Period: "Money Heist: Part 1" with `r number(heist$avg_hours, scale = 1e-6, accuracy = 0.1, suffix = "M")` hours. This tells us even if it is at the bottom of the top 10 Titles, people watch it consistently and go to it as a trusted "Comfort Food Show".
+To create the table and define what is considered a "Comfort Food", I used the Titles that appeared in all 7 reports, and they are ranked by the lowest period to avoid the average being pushed up by temporary spikes. After checking the table above, we can see that both "Pablo Escobar, el patron del mal: Season 1" and "Chiquititas (2013)" have the highest Lowest Period since they are both over 105M hours. The highest overall Average per Period was "Stranger Things 4" by far with `r number(st4$avg_hours, scale = 1e-6, accuracy = 0.1, suffix = "M")` hours. This is a considerable difference compared to the other Titles, and the second Title with the highest overall Average per Period was "Pablo Escobar, el patron del mal: Season 1" with `r number(escobar$avg_hours, scale = 1e-6, accuracy = 0.1, suffix = "M")` hours. But this doesn't necessarily mean they are the top "comfort food shows" since we see other shows pop up multiple times just different seasons. For example: "Breaking Bad" Season 2, 3, and 5, meaning users came back to see a show that was released many years or seasons ago and still decide to spend their time watching it consistently over watching new shows. On the other hand, when we check how viewing behavior changes between periods (Standard Deviation(hours)), we can see the Title with the highest volatility is also "Stranger Things 4", which means even if it has the highest average within this top 10 Titles, it is not steady and it was just a big hit during a short period of time compared to the other shows. The Title with the lowest Standard Deviation (`r number(heist$sd_hours, scale = 1e-6, accuracy = 0.1, suffix = "M")`) was also the Title with the lowest Average per Period: "Money Heist: Part 1" with `r number(heist$avg_hours, scale = 1e-6, accuracy = 0.1, suffix = "M")` hours. This tells us even if it is at the bottom of the top 10 Titles, people watch it consistently and go to it as a trusted "Comfort Food Show".
 
-**4. Within each period, what fraction of time was spent on ‘shows’ vs movies?**
+###### 4. Within each period, what fraction of time was spent on ‘shows’ vs movies?
 
 ```{r}
 # Heuristic: runtime over 240 minutes (4 hours) = TV show, otherwise movie.
@@ -392,7 +407,8 @@ I encountered a small limiting issue where short miniseries that are under 4 hou
 The analysis tells us that from 2023H2 on TV shows take between `r percent(min_tv_share, accuracy = 0.1)` and `r percent(max_tv_share, accuracy = 0.1)` of the hours viewed vs movies only `r percent(avg_movie_share, accuracy = 0.1)`. We can conclude this is stable since between years 2023 and 2026 there is not much fluctuation as seen in the table above. I am not using 2023H1 in this analysis since there is about `r percent(unclassified_2023h1, accuracy = 0.1)` of the share of viewing hours that is unclassified. But given the trend we could potentially assume since movies are still `r percent(movie_2023h1, accuracy = 0.1)`, about the same as the later average (`r percent(avg_movie_share, accuracy = 0.1)`), the unclassified data would be mostly shows.
 
 
-**5. How does the performance of live events compare to pre-taped content? Does the average live event draw more viewership than an average piece of pre-taped content? How about a ‘top tier’ live event vs ‘top tier’ pre-taped content?**
+###### 5. How does the performance of live events compare to pre-taped content? Does the average live event draw more viewership than an average piece of pre-taped content? How about a ‘top tier’ live event vs ‘top tier’ pre-taped content?
+
 ```{r}
 # Compare average viewership overall and among each group's top 10%
 # (top 10% is fairer than a fixed top-N since live events are rare).
@@ -434,14 +450,14 @@ live_vs_taped |>
 
 When analyzing Live Events vs Pre-Taped Content, I compared the average hours per title, the overall, and the top 10% of each group. The top 10% is much more fair compared to a fixed top 10 because there are only `r comma(live$n)` live events vs `r comma(taped$n)` Pre-Taped.
 
-I found Pre-Taped content wins Live Events in both categories: Average Hours by `r number(gap_avg, accuracy = 0.1, suffix = " times")` and top 10% average hours by `r number(gap_top, accuracy = 0.1, suffix = " times")`. This number difference gets bigger as you move from Average Hours to the top 10% Average Hours, meaning Pre-Taped has a lot more hours It is important to point out there are very few Live Events, so this analysis is being based on that small sample. Also the hour length the events last makes a difference since short events are in the same category as multiple hour long events or seasons, so that makes Live Events look like they have a smaller viewer audience.
+I found Pre-Taped content wins Live Events in both categories: Average Hours by `r number(gap_avg, accuracy = 0.1, suffix = " times")` and top 10% average hours by `r number(gap_top, accuracy = 0.1, suffix = " times")`. This number difference gets bigger as you move from Average Hours to the top 10% Average Hours, meaning Pre-Taped has a lot more hours. It is important to point out there are very few Live Events, so this analysis is being based on that small sample. Also the hour length the events last makes a difference since short events are in the same category as multiple hour long events or seasons, so that makes Live Events look like they have a smaller viewer audience.
 
 ### Corporate Strategy Memo
 
 
-## AI Usage Statement
+### AI Usage Statement
 
 ::: {.callout-note title="AI Usage Statement" collapse="true"}
 
-I used Claude by Anthropic and Gemini to help me understand concepts and tools in depth and complete the R code. It also helped to fix errors, provide improvement suggestions, and point out spelling mistakes throughout the project. The report was written by me.
+I used Claude by Anthropic and Gemini to help me understand concepts and tools in depth and complete the R code. They also helped to fix errors, provide improvement suggestions, and point out spelling mistakes throughout the project. The report was written by me.
 :::
