@@ -485,9 +485,9 @@ bus_trip    <- mta_by_mode |> filter(mode == "Bus") |> pull(avg_trip)
 
 The average trip length on the MTA NYC is `r number(mta_avg_trip, accuracy = 0.01)` miles in all modes, `r number(subway_trip, accuracy = 0.01)` miles in subway, and `r number(bus_trip, accuracy = 0.01)` miles in bus.
 
-###Data Integration
+### Data Integration
 
-#task 4 Practice Joining Data Files
+# Joining Data Files
 
 1. How many UPTs were recorded in states where the primary energy source was nuclear power?
 
@@ -498,10 +498,65 @@ About 561,675,933 were recorded in states where the primary energy source was nu
 Illinois was the area with the most gallons of bio-diesel used by public transit agencies with 426.5M trips. 
 
 
-#TASK 5
-####Data Analysis (Calculate Total Emissions)
+#### Data Analysis 
 
-(Compute the total emissions associated with each Agency + Mode pair.)
+## Calculating Total Emissions
+
+Here we combine the three tables NTD_SERVICE, NTD_ENERGY, and EIA_SEP_REPORT together to be able to get the CO2 associated with each agency and mode. 
+
+```{r}
+# NTD_SERVICE has several rows per agency + mode (split by type of service), so add
+# them up first. Also convert the ID from text ("00001") to a number to match NTD_ENERGY.
+service_by_mode <- NTD_SERVICE |>
+  mutate(NTD_ID = as.numeric(NTD_ID)) |>
+  group_by(NTD_ID, AGENCY, state, mode) |>
+  summarize(
+    total_upt       = sum(total_upt, na.rm = TRUE),
+    passenger_miles = sum(sum_passenger_miles, na.rm = TRUE),
+    .groups = "drop"
+  )
+```
+
+```{r}
+# Join 1: fuel use + ridership, matched on agency ID AND mode (inner: need both)
+# Join 2: + each state's CO2 per MWh for electric vehicles (inner: 50 states only)
+emissions <- NTD_ENERGY |>
+  inner_join(service_by_mode, join_by(`NTD ID` == NTD_ID, Mode == mode)) |>
+  inner_join(EIA_SEP_REPORT |> select(abbreviation, CO2_MWh),
+             join_by(state == abbreviation))
+```
+
+```{r}
+# EIA CO2 conversion factors (pounds of CO2 per gallon), from
+# https://www.eia.gov/environment/emissions/co2_vol_mass.php
+CO2_DIESEL   <- 22.45   # also used for bio-diesel
+CO2_RESIDUAL <- 24.78   # bunker fuel
+CO2_GASOLINE <- 18.73   # finished motor gasoline, also used for ethanol
+CO2_KEROSENE <- 21.78
+CO2_PROPANE  <- 12.68   # liquified petroleum gas
+CO2_CNG      <- 120.85 * 0.12667   # natural gas per Mcf x Mcf per gallon equivalent
+CO2_LNG      <- 120.85 * 0.0826    # natural gas per Mcf x Mcf per gallon of LNG
+
+emissions <- emissions |>
+  mutate(
+    total_co2_lbs =
+      (`Gallons of Diesel Fuel` + `Gallons of Bio-Diesel`) * CO2_DIESEL +
+      `Gallons of Bunker Fuel`                             * CO2_RESIDUAL +
+      (`Gallons of Gasoline` + `Gallons of Ethanol`)       * CO2_GASOLINE +
+      `Gallons of Kerosene`                                * CO2_KEROSENE +
+      `Gallons of Liquified Petroleum Gas`                 * CO2_PROPANE +
+      `Gallons of Compressed Natural Gas`                  * CO2_CNG +
+      `Gallons of Liquified Nat Gas`                       * CO2_LNG +
+      # electricity: kWh -> MWh (divide by 1000) x the state's lbs CO2 per MWh
+      (`Kilowatt hours of Electric Battery` +
+         `Kilowatt hours of Electric Propulsion`) / 1000 * CO2_MWh,
+    total_co2_tons = total_co2_lbs / 2000   # 2,000 lbs = 1 short ton
+  )
+```
+
+I used inner_join to merge NTD_ENERGY with service_by_mode and then I merged that with EIA_SEP_REPORT. I joined them using inner_join because I needed ridership and fuel to compute the emissions. The Emissions were computed by multiplying each fuel with its EIA CO2 fuel factors data found in the EIA link [EIA's CO2 emissions coefficients](https://www.eia.gov/environment/emissions/co2_vol_mass.php).
+
+Then the Electricity Emissions was computed by converting kWh to MWh (1MWh=1,000kWh) and then multiplying the MWh from NTD_ENERGY by the states CO2 per MWh that could be found in the EIA_SEP_REPORT. The fuel and electricity emissions are added for the total.
 
 #TASK 6:
 ####Normalize Emissions to Transit Usage
