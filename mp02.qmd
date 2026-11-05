@@ -349,6 +349,12 @@ gallon_cols <- c("Gallons of Bio-Diesel", "Gallons of Bunker Fuel",
                  "Gallons of Liquified Nat Gas", "Gallons of Liquified Petroleum Gas")
 
 # Add up each agency's fuel across all its modes, then keep the 5 biggest users
+top_fuel_agencies <- NTD_ENERGY |>
+  group_by(`NTD ID`, `Agency Name`) |>
+  summarize(across(all_of(gallon_cols), sum), .groups = "drop") |>
+  mutate(total_gallons = rowSums(across(all_of(gallon_cols)))) |>
+  slice_max(total_gallons, n = 5)
+
 top_fuel_agencies |>
   select(`Agency Name`, total_gallons, `Gallons of Diesel Fuel`,
          `Gallons of Compressed Natural Gas`, `Gallons of Gasoline`) |>
@@ -368,9 +374,9 @@ top_fuel_agencies |>
   tab_source_note(md("Source: National Transit Database, 2025 Energy Consumption."))
 ```
 
-The top 5 agencies that used the most gallons of fuel where 	`r top_fuel_agencies$`Agency Name`[1]` with `r comma(top_fuel_agencies$total_gallons[1])` total gallons, `r top_fuel_agencies$`Agency Name`[2]`, `r top_fuel_agencies$`Agency Name`[3]`, `r top_fuel_agencies$`Agency Name`[4]`, `r top_fuel_agencies$`Agency Name`[5]` with `r comma(top_fuel_agencies$total_gallons[5])` gallons. 
+The top 5 agencies that used the most gallons of fuel where 	`r top_fuel_agencies[["Agency Name"]][1]` with `r comma(top_fuel_agencies$total_gallons[1])` total gallons, `r top_fuel_agencies[["Agency Name"]][2]`, `r top_fuel_agencies[["Agency Name"]][3]`, `r top_fuel_agencies[["Agency Name"]][4]`, `r top_fuel_agencies[["Agency Name"]][5]` with `r comma(top_fuel_agencies$total_gallons[5])` gallons. 
 
-In all agencies diesel was the most gallon-basedused type of energy except for `r top_fuel_agencies$`Agency Name`[3]` that used `r comma(top_fuel_agencies$`Gallons of Diesel Fuel`[3])` diesel and on the contrary used the highest amount of CNG with `r comma(top_fuel_agencies$`Gallons of Compressed Natural Gas`[3])`. For 	`r top_fuel_agencies$`Agency Name`[4]` this is the only agency that relies solely on diesel when it comes to gallon-based fuels, and uses no other types of gallon- based energy, while   `r paste(top_fuel_agencies$`Agency Name`[c(1, 2, 5)], collapse = ", ")` use diesel, CNG, and gasoline.
+In all agencies diesel was the most gallon-basedused type of energy except for `r top_fuel_agencies[["Agency Name"]][3]` that used `r comma(top_fuel_agencies[["Gallons of Diesel Fuel"]][3])` diesel and on the contrary used the highest amount of CNG with `r comma(top_fuel_agencies[["Gallons of Compressed Natural Gas"]][3])`. For 	`r top_fuel_agencies[["Agency Name"]][4]` this is the only agency that relies solely on diesel when it comes to gallon-based fuels, and uses no other types of gallon- based energy, while   `r paste(top_fuel_agencies[["Agency Name"]][c(1, 2, 5)], collapse = ", ")` use diesel, CNG, and gasoline.
 
 
 2. Across all US public transit, visualize the amounts of each type of fuel used:
@@ -397,8 +403,12 @@ ggplot(fuel_totals, aes(x = reorder(fuel, gallons), y = gallons)) +
   theme(plot.title.position = "plot")
 
 # Values referenced in the text
-diesel_gallons <- fuel_totals |> filter(fuel == "Diesel Fuel") |> pull(gallons)
-diesel_share   <- diesel_gallons / sum(fuel_totals$gallons)
+diesel_gallons    <- fuel_totals |> filter(fuel == "Diesel Fuel") |> pull(gallons)
+diesel_share      <- diesel_gallons / sum(fuel_totals$gallons)
+
+cng_gallons       <- fuel_totals |> filter(fuel == "Compressed Natural Gas") |> pull(gallons)
+cng_share         <- cng_gallons / sum(fuel_totals$gallons)
+
 gas_gallons       <- fuel_totals |> filter(fuel == "Gasoline") |> pull(gallons)
 gas_share         <- gas_gallons / sum(fuel_totals$gallons)
 
