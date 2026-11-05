@@ -483,7 +483,7 @@ subway_trip <- mta_by_mode |> filter(mode == "Heavy Rail") |> pull(avg_trip)
 bus_trip    <- mta_by_mode |> filter(mode == "Bus") |> pull(avg_trip)
 ```
 
-The average trip lenght on the MTA NYC is `r number(mta_avg_trip, accuracy = 0.01)` miles in all modes, `r number(subway_trip, accuracy = 0.01)` miles in subway, and `r number(bus_trip, accuracy = 0.01)` miles in bus.
+The average trip length on the MTA NYC is `r number(mta_avg_trip, accuracy = 0.01)` miles in all modes, `r number(subway_trip, accuracy = 0.01)` miles in subway, and `r number(bus_trip, accuracy = 0.01)` miles in bus.
 
 ###Data Integration
 
