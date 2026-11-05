@@ -310,7 +310,7 @@ dirtiest_states |>
 
 Here we can see the 5 states have the ‘dirtiest’ electricity mix are West Virginia with `r comma(dirtiest_states$CO2_MWh[1])`, Kentucky with `r comma(dirtiest_states$CO2_MWh[2])`, Wyoming with `r comma(dirtiest_states$CO2_MWh[3])`, Missouri with `r comma(dirtiest_states$CO2_MWh[4])`, and Hawaii with `r comma(dirtiest_states$CO2_MWh[5])`.
 
-3. On average, how many pounds of CO2 are emitted per MWh of electricity produced in the US? (Note that you will need to use a suitably weighted average here.) 
+3. On average, how many pounds of CO2 are emitted per MWh of electricity produced in the US? 
 
 ```{r}
 
@@ -322,7 +322,7 @@ us_avg_co2 <- weighted.mean(EIA_SEP_REPORT$CO2_MWh,
 
 On average `r comma(us_avg_co2, accuracy = 1)` pounds of CO2 are emitted per Mwh of electricity produced in the United States.
 
-5. My home state, Texas, has a reputation as being the home of “dirty fossil fuels” while NY has a reputation as a leader in clean energy. How many times cleaner is NY’s energy mix than that of Texas? (Inline answer)
+5. My home state, Texas, has a reputation as being the home of “dirty fossil fuels” while NY has a reputation as a leader in clean energy. How many times cleaner is NY’s energy mix than that of Texas? 
 ```{r}
 
 # How many times more CO2 per MWh Texas emits compared with New York
