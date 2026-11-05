@@ -333,14 +333,79 @@ ny_cleaner <- tx_co2 / ny_co2
 
 NY's energy mix is `r comma(ny_co2)` pounds of CO₂ per MWh, Texas energy mix is `r comma(tx_co2)` pounds of CO₂ per MWh, and NY's energy mix is `r number(ny_cleaner, accuracy = 0.01)` pounds of CO₂ per MWh times cleaner than the energy mix in Texas.
 
-#TASK 3B
+
 #EDA - NTD Energy Usage
 
-1. Which five transit agencies used the most gallons of fuel (all sources) and how did it breakdown by type? (Table)
+1. Which five transit agencies used the most gallons of fuel (all sources) and how did it breakdown by type?
 
-2. Across all US public transit, visualize the amounts of each type of fuel used (Graph)
+What the code below does is leave out fuels that were not measured in gallons and then added the sum of all the gallons to create the list of the top 5 with the highest total combined of gallon usage.
 
-3. What is the least commonly used fuel source for US public transit? (Inline)
+```{r}
+# Fuel columns measured in gallons (electricity is in kWh and hydrogen in kg,
+# so they can't be added to gallons and are left out here)
+gallon_cols <- c("Gallons of Bio-Diesel", "Gallons of Bunker Fuel",
+                 "Gallons of Compressed Natural Gas", "Gallons of Diesel Fuel",
+                 "Gallons of Ethanol", "Gallons of Gasoline", "Gallons of Kerosene",
+                 "Gallons of Liquified Nat Gas", "Gallons of Liquified Petroleum Gas")
+
+# Add up each agency's fuel across all its modes, then keep the 5 biggest users
+top_fuel_agencies |>
+  select(`Agency Name`, total_gallons, `Gallons of Diesel Fuel`,
+         `Gallons of Compressed Natural Gas`, `Gallons of Gasoline`) |>
+  gt() |>
+  tab_header(
+    title = "Transit Agencies Using the Most Fuel",
+    subtitle = "Gallons of combustion fuel, all modes combined"
+  ) |>
+  cols_label(
+    `Agency Name` = "Agency",
+    total_gallons = "Total",
+    `Gallons of Diesel Fuel` = "Diesel",
+    `Gallons of Compressed Natural Gas` = "CNG",
+    `Gallons of Gasoline` = "Gasoline"
+  ) |>
+  fmt_number(-`Agency Name`, decimals = 0) |>
+  tab_source_note(md("Source: National Transit Database, 2025 Energy Consumption."))
+```
+
+The top 5 agencies that used the most gallons of fuel where 	`r top_fuel_agencies$`Agency Name`[1]` with `r comma(top_fuel_agencies$total_gallons[1])` total gallons, `r top_fuel_agencies$`Agency Name`[2]`, `r top_fuel_agencies$`Agency Name`[3]`, `r top_fuel_agencies$`Agency Name`[4]`, `r top_fuel_agencies$`Agency Name`[5]` with `r comma(top_fuel_agencies$total_gallons[5])` gallons. 
+
+In all agencies diesel was the most gallon-basedused type of energy except for `r top_fuel_agencies$`Agency Name`[3]` that used `r comma(top_fuel_agencies$`Gallons of Diesel Fuel`[3])` diesel and on the contrary used the highest amount of CNG with `r comma(top_fuel_agencies$`Gallons of Compressed Natural Gas`[3])`. For 	`r top_fuel_agencies$`Agency Name`[4]` this is the only agency that relies solely on diesel when it comes to gallon-based fuels, and uses no other types of gallon- based energy, while   `r paste(top_fuel_agencies$`Agency Name`[c(1, 2, 5)], collapse = ", ")` use diesel, CNG, and gasoline.
+
+
+2. Across all US public transit, visualize the amounts of each type of fuel used:
+
+```{r}
+# Total gallons of each fuel across all US transit agencies
+fuel_totals <- NTD_ENERGY |>
+  summarize(across(all_of(gallon_cols), sum)) |>
+  pivot_longer(everything(), names_to = "fuel", values_to = "gallons") |>
+  mutate(fuel = str_remove(fuel, "Gallons of "))
+
+ggplot(fuel_totals, aes(x = reorder(fuel, gallons), y = gallons)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  scale_y_continuous(labels = label_comma(scale = 1e-6, suffix = "M")) +
+  labs(
+    title = "Fuel Used by US Public Transit",
+    subtitle = "Total gallons by fuel type, 2025",
+    x = NULL,
+    y = "Gallons (millions)",
+    caption = "Source: National Transit Database, 2025 Energy Consumption"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(plot.title.position = "plot")
+
+# Values referenced in the text
+diesel_gallons <- fuel_totals |> filter(fuel == "Diesel Fuel") |> pull(gallons)
+diesel_share   <- diesel_gallons / sum(fuel_totals$gallons)
+gas_gallons       <- fuel_totals |> filter(fuel == "Gasoline") |> pull(gallons)
+gas_share         <- gas_gallons / sum(fuel_totals$gallons)
+
+biodiesel_gallons <- fuel_totals |> filter(fuel == "Bio-Diesel") |> pull(gallons)
+biodiesel_share   <- biodiesel_gallons / sum(fuel_totals$gallons)
+```
+We can see in the graph above that Diesel Fuel was the most used overall by US Public Transit with `r comma(diesel_gallons, scale = 1e-6, accuracy = 1, suffix = " million")` gallons. The second most used was Compressed Natural Gas with `r comma(cng_gallons, scale = 1e-6, accuracy = 1, suffix = " million")` gallons, and the third was Gasoline with `r comma(gas_gallons, scale = 1e-6, accuracy = 1, suffix = " million")` gallons. Overall, diesel had `r percent(diesel_share, accuracy = 0.1)` share of the amount of gallons used which is more than half of the gallon based energy. Compressed natural gas had a `r percent(cng_share, accuracy = 0.1)` share of the amount of gallons, and the rest of the shares are divided into the remaining of the gallon-based energies in smaller shares. 
 
 # EDA - NTD Service 
 
