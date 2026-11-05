@@ -558,8 +558,57 @@ I used inner_join to merge NTD_ENERGY with service_by_mode and then I merged tha
 
 Then the Electricity Emissions was computed by converting kWh to MWh (1MWh=1,000kWh) and then multiplying the MWh from NTD_ENERGY by the states CO2 per MWh that could be found in the EIA_SEP_REPORT. The fuel and electricity emissions are added for the total.
 
-#TASK 6:
-####Normalize Emissions to Transit Usage
+#### Normalize Emissions to Transit Usage (Emissions per trip and per mile)
+
+```{r}
+# Combine each agency's modes, then compute emissions per trip and per passenger mile.
+# Very small agencies (under 100,000 trips a year) are dropped because their ratios
+# swing wildly, and the rest are grouped by size so they compete with similar agencies.
+agency_emissions <- emissions |>
+  group_by(`NTD ID`, `Agency Name`, state) |>
+  summarize(
+    total_co2_lbs   = sum(total_co2_lbs),
+    total_upt       = sum(total_upt),
+    passenger_miles = sum(passenger_miles),
+    .groups = "drop"
+  ) |>
+  filter(total_upt >= 100000, passenger_miles > 0) |>
+  mutate(
+    co2_per_trip = total_co2_lbs / total_upt,          # lbs of CO2 per trip
+    co2_per_mile = total_co2_lbs / passenger_miles,    # lbs of CO2 per passenger mile
+    size = case_when(
+      total_upt < 1e6 ~ "Small",    # 100k to 1 million trips a year
+      total_upt < 2e7 ~ "Medium",   # 1 to 20 million
+      TRUE            ~ "Large"     # 20 million or more
+    )
+  )
+
+# Most efficient agency in each size group (lowest CO2 per passenger mile)
+agency_emissions |>
+  group_by(size) |>
+  slice_min(co2_per_mile, n = 3) |>
+  ungroup() |>
+  mutate(size = factor(size, levels = c("Small", "Medium", "Large"))) |>
+  arrange(size, co2_per_mile) |>
+  select(size, `Agency Name`, state, total_upt, co2_per_trip, co2_per_mile) |>
+  gt(groupname_col = "size") |>
+  tab_header(
+    title = "Most Efficient Transit Agencies by Size",
+    subtitle = "Lowest pounds of CO2 per passenger mile, 2025"
+  ) |>
+  cols_label(
+    `Agency Name` = "Agency",
+    state = "State",
+    total_upt = "Trips",
+    co2_per_trip = "CO2 per Trip (lbs)",
+    co2_per_mile = "CO2 per Mile (lbs)"
+  ) |>
+  fmt_number(total_upt, decimals = 0) |>
+  fmt_number(c(co2_per_trip, co2_per_mile), decimals = 3) |>
+  tab_source_note(md("Sources: National Transit Database (2025); EIA State Electricity Profiles; EIA CO2 coefficients."))
+```
+
+
 
 #TASK 7: Determine Award Winners
 
