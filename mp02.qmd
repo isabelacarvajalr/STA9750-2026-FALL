@@ -16,9 +16,7 @@ execute:
 ## Introduction: 
 
 
-### Data Acquisition 
-
-#### State Electricity Profiles
+### Data Acquisition- State Electricity Profiles
 ```{r}
 library(tidyverse)
 library(stringr)
@@ -249,7 +247,11 @@ recode_mode <- function(x) {
 NTD_ENERGY  <- NTD_ENERGY  |> mutate(Mode = recode_mode(Mode))
 NTD_SERVICE <- NTD_SERVICE |> mutate(mode = recode_mode(mode))
 ```
-# TASK 3: 
+## Exploratory Data analysis
+
+The problem was the data had 2 letter codes and there are `r n_distinct(NTD_ENERGY$Mode)` different ones. For anyone that is not familiar with what each means its hard to understand so I renamed the. I found them with distinct(), then built one function and used it so the two tables NTD_Energy and NTD_Service can be matched on mode later since the labels on both have to be identical. The most agency mode rows in the data set was Bus and Demand response.
+
+
 #### EDA EIA State Electricity Profiles
 
 ```{r}
@@ -257,7 +259,7 @@ NTD_SERVICE <- NTD_SERVICE |> mutate(mode = recode_mode(mode))
 library(gt)
 library(scales)
 ```
-1. Which 5 states have the most expensive retail electricity? (Graph)
+1. Which 5 states have the most expensive retail electricity? 
 ```{r}
 # The 5 states with the highest average retail electricity price
 expensive_states <- EIA_SEP_REPORT |>
@@ -278,13 +280,37 @@ ggplot(expensive_states,
   ) +
   theme_minimal(base_size = 14)
 ```
-
+We can see that `r expensive_states$state[1]` is the state with the highest expensive Retail Electricity with `r dollar(expensive_states$electricity_price_MWh[1])`, followed by `r expensive_states$state[2]` with `r dollar(EIA_SEP_REPORT |> filter(state == "California") |> pull(electricity_price_MWh))`, `r expensive_states$state[3]`, `r expensive_states$state[4]`, and `r expensive_states$state[5]` with `r dollar(expensive_states$electricity_price_MWh[5])`.
 
 
 2. Which 5 states have the ‘dirtiest’ electricity mix? (Table)
 
+```{r}
+# The 5 states with the highest CO2 emitted per MWh of electricity produced
+dirtiest_states <- EIA_SEP_REPORT |>
+  slice_max(CO2_MWh, n = 5) |>
+  select(state, primary_source, CO2_MWh, electricity_price_MWh)
 
-3. On average, how many pounds of CO2 are emitted per MWh of electricity produced in the US? (Note that you will need to use a suitably weighted average here.) (Inline answer)
+dirtiest_states |>
+  gt() |>
+  tab_header(
+    title = "States with the Dirtiest Electricity",
+    subtitle = "Pounds of CO2 emitted per MWh generated"
+  ) |>
+  cols_label(
+    state = "State",
+    primary_source = "Primary Source",
+    CO2_MWh = "CO2 (lbs/MWh)",
+    electricity_price_MWh = "Price ($/MWh)"
+  ) |>
+  fmt_number(CO2_MWh, decimals = 0) |>
+  fmt_currency(electricity_price_MWh, decimals = 2) |>
+  tab_source_note(md("Source: EIA State Electricity Profiles."))
+```
+
+Here we can see the 5 states have the ‘dirtiest’ electricity mix are West Virginia with `r comma(dirtiest_states$CO2_MWh[1])`, Kentucky with `r comma(dirtiest_states$CO2_MWh[2])`, Wyoming with `r comma(dirtiest_states$CO2_MWh[3])`, Missouri with `r comma(dirtiest_states$CO2_MWh[4])`, and Hawaii with `r comma(dirtiest_states$CO2_MWh[5])`.
+
+3. On average, how many pounds of CO2 are emitted per MWh of electricity produced in the US? (Note that you will need to use a suitably weighted average here.) 
 
 ```{r}
 
@@ -294,8 +320,7 @@ us_avg_co2 <- weighted.mean(EIA_SEP_REPORT$CO2_MWh,
                             EIA_SEP_REPORT$generation_MWh)
 ```
 
-                            
-4. What are the three rarest primary energy sources in the US? What is the associated cost of electricity associated with each source and in what states are they used? (Table answer)
+On average `r comma(us_avg_co2, accuracy = 1)` pounds of CO2 are emitted per Mwh of electricity produced in the United States.
 
 5. My home state, Texas, has a reputation as being the home of “dirty fossil fuels” while NY has a reputation as a leader in clean energy. How many times cleaner is NY’s energy mix than that of Texas? (Inline answer)
 ```{r}
@@ -305,6 +330,8 @@ tx_co2 <- EIA_SEP_REPORT |> filter(abbreviation == "TX") |> pull(CO2_MWh)
 ny_co2 <- EIA_SEP_REPORT |> filter(abbreviation == "NY") |> pull(CO2_MWh)
 ny_cleaner <- tx_co2 / ny_co2
 ```
+
+NY's energy mix is `r comma(ny_co2)` pounds of CO₂ per MWh, Texas energy mix is `r comma(tx_co2)` pounds of CO₂ per MWh, and NY's energy mix is `r number(ny_cleaner, accuracy = 0.01)` pounds of CO₂ per MWh times cleaner than the energy mix in Texas.
 
 #TASK 3B
 #EDA - NTD Energy Usage

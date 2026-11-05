@@ -140,15 +140,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction:</a>
   <ul>
-  <li><a href="#data-acquisition" id="toc-data-acquisition" class="nav-link" data-scroll-target="#data-acquisition">Data Acquisition</a>
+  <li><a href="#data-acquisition--state-electricity-profiles" id="toc-data-acquisition--state-electricity-profiles" class="nav-link" data-scroll-target="#data-acquisition--state-electricity-profiles">Data Acquisition- State Electricity Profiles</a>
   <ul class="collapse">
-  <li><a href="#state-electricity-profiles" id="toc-state-electricity-profiles" class="nav-link" data-scroll-target="#state-electricity-profiles">State Electricity Profiles</a></li>
   <li><a href="#energy-consumption-ntd-energy-usage" id="toc-energy-consumption-ntd-energy-usage" class="nav-link" data-scroll-target="#energy-consumption-ntd-energy-usage">Energy Consumption (NTD Energy Usage)</a></li>
   <li><a href="#transit-service-provided" id="toc-transit-service-provided" class="nav-link" data-scroll-target="#transit-service-provided">Transit Service Provided</a></li>
   </ul></li>
   </ul></li>
   <li><a href="#recoding-the-mode-column" id="toc-recoding-the-mode-column" class="nav-link" data-scroll-target="#recoding-the-mode-column">Recoding the Mode Column</a></li>
-  <li><a href="#task-3" id="toc-task-3" class="nav-link" data-scroll-target="#task-3">TASK 3:</a>
+  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis" class="nav-link" data-scroll-target="#exploratory-data-analysis">Exploratory Data analysis</a>
   <ul>
   <li><a href="#eda-eia-state-electricity-profiles" id="toc-eda-eia-state-electricity-profiles" class="nav-link" data-scroll-target="#eda-eia-state-electricity-profiles">EDA EIA State Electricity Profiles</a></li>
   </ul></li>
@@ -189,10 +188,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction:</h2>
-<section id="data-acquisition" class="level3">
-<h3 class="anchored" data-anchor-id="data-acquisition">Data Acquisition</h3>
-<section id="state-electricity-profiles" class="level4">
-<h4 class="anchored" data-anchor-id="state-electricity-profiles">State Electricity Profiles</h4>
+<section id="data-acquisition--state-electricity-profiles" class="level3">
+<h3 class="anchored" data-anchor-id="data-acquisition--state-electricity-profiles">Data Acquisition- State Electricity Profiles</h3>
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
@@ -275,7 +272,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>EIA_SEP_REPORT <span class="ot">&lt;-</span> <span class="fu">map2</span>(state.name, state.abb, get_eia_sep) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-</section>
 <section id="energy-consumption-ntd-energy-usage" class="level4">
 <h4 class="anchored" data-anchor-id="energy-consumption-ntd-energy-usage">Energy Consumption (NTD Energy Usage)</h4>
 <div class="cell">
@@ -465,8 +461,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 </section>
-<section id="task-3" class="level1">
-<h1>TASK 3:</h1>
+<section id="exploratory-data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis">Exploratory Data analysis</h2>
+<p>The problem was the data had 2 letter codes and there are 17 different ones. For anyone that is not familiar with what each means its hard to understand so I renamed the. I found them with distinct(), then built one function and used it so the two tables NTD_Energy and NTD_Service can be matched on mode later since the labels on both have to be identical. The most agency mode rows in the data set was Bus and Demand response.</p>
 <section id="eda-eia-state-electricity-profiles" class="level4">
 <h4 class="anchored" data-anchor-id="eda-eia-state-electricity-profiles">EDA EIA State Electricity Profiles</h4>
 <div class="cell">
@@ -478,7 +475,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <ol type="1">
-<li>Which 5 states have the most expensive retail electricity? (Graph)</li>
+<li>Which 5 states have the most expensive retail electricity?</li>
 </ol>
 <div class="cell">
 <details class="code-fold">
@@ -510,6 +507,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<p>We can see that Hawaii is the state with the highest expensive Retail Electricity with $380, followed by California $270.40, Conneticut, Rhode Island, and Massachusets with $239.40.</p>
 <ol start="2" type="1">
 <li><p>Which 5 states have the ‘dirtiest’ electricity mix? (Table)</p></li>
 <li><p>On average, how many pounds of CO2 are emitted per MWh of electricity produced in the US? (Note that you will need to use a suitably weighted average here.) (Inline answer)</p></li>
@@ -1065,353 +1063,355 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="fu">## Introduction: </span></span>
 <span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data Acquisition </span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="fu">#### State Electricity Profiles</span></span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr2)</span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rvest)</span>
-<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>get_eia_sep <span class="ot">&lt;-</span> <span class="cf">function</span>(state, abbr){</span>
-<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(tidyverse)</span>
-<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(stringr)</span>
-<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(httr2)</span>
-<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(rvest)</span>
-<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(fs)</span>
-<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>    state_formatted <span class="ot">&lt;-</span> <span class="fu">str_to_lower</span>(state) <span class="sc">|&gt;</span> <span class="fu">str_replace_all</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">s"</span>, <span class="st">""</span>)</span>
-<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>    dir_name <span class="ot">&lt;-</span> fs<span class="sc">::</span><span class="fu">path</span>(<span class="st">"data"</span>, <span class="st">"mp02"</span>)</span>
-<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>    file_name <span class="ot">&lt;-</span> fs<span class="sc">::</span><span class="fu">path</span>(dir_name, state_formatted)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data Acquisition- State Electricity Profiles</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr2)</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rvest)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>get_eia_sep <span class="ot">&lt;-</span> <span class="cf">function</span>(state, abbr){</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(tidyverse)</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(stringr)</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(httr2)</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(rvest)</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(fs)</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>    state_formatted <span class="ot">&lt;-</span> <span class="fu">str_to_lower</span>(state) <span class="sc">|&gt;</span> <span class="fu">str_replace_all</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">s"</span>, <span class="st">""</span>)</span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>    dir_name <span class="ot">&lt;-</span> fs<span class="sc">::</span><span class="fu">path</span>(<span class="st">"data"</span>, <span class="st">"mp02"</span>)</span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>    file_name <span class="ot">&lt;-</span> fs<span class="sc">::</span><span class="fu">path</span>(dir_name, state_formatted)</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>    fs<span class="sc">::</span><span class="fu">dir_create</span>(dir_name, <span class="at">recurse=</span><span class="cn">TRUE</span>)</span>
 <span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>    fs<span class="sc">::</span><span class="fu">dir_create</span>(dir_name, <span class="at">recurse=</span><span class="cn">TRUE</span>)</span>
-<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="sc">!</span>fs<span class="sc">::</span><span class="fu">file_exists</span>(file_name)){</span>
-<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>        BASE_URL <span class="ot">&lt;-</span> <span class="st">"https://www.eia.gov"</span></span>
-<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>        RESPONSE <span class="ot">&lt;-</span> <span class="fu">request</span>(BASE_URL) <span class="sc">|&gt;</span> </span>
-<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a>          <span class="fu">req_url_path</span>(<span class="st">"electricity"</span>, </span>
-<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"state"</span>, </span>
-<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a>                       state_formatted) <span class="sc">|&gt;</span></span>
-<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>          <span class="fu">req_headers</span>(</span>
-<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">User-Agent</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:149.0) Gecko/20100101 Firefox/149.0"</span></span>
-<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a>            ) <span class="sc">|&gt;</span>   </span>
-<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>          <span class="fu">req_retry</span>(</span>
-<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a>                <span class="at">max_tries =</span> <span class="dv">4</span>, </span>
-<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>          ) <span class="sc">|&gt;</span></span>
-<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>          <span class="fu">req_perform</span>(file_name)</span>
-<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>        <span class="fu">resp_check_status</span>(RESPONSE)</span>
-<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a>    TABLE <span class="ot">&lt;-</span> <span class="fu">read_html</span>(file_name) <span class="sc">|&gt;</span> </span>
-<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a>        <span class="fu">html_element</span>(<span class="st">"table"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a>        <span class="fu">html_table</span>() <span class="sc">|&gt;</span></span>
-<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">Item =</span> <span class="fu">str_to_lower</span>(Item))</span>
-<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="st">"U.S. rank"</span> <span class="sc">%in%</span> <span class="fu">colnames</span>(TABLE)){</span>
-<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a>        TABLE <span class="ot">&lt;-</span> TABLE <span class="sc">|&gt;</span> <span class="fu">rename</span>(<span class="at">Rank =</span> <span class="st">`</span><span class="at">U.S. rank</span><span class="st">`</span>)</span>
-<span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb11-70"><a href="#cb11-70" aria-hidden="true" tabindex="-1"></a>    CO2_MWh <span class="ot">&lt;-</span> TABLE <span class="sc">|&gt;</span> </span>
-<span id="cb11-71"><a href="#cb11-71" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(Item <span class="sc">==</span> <span class="st">"carbon dioxide (lbs/mwh)"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-72"><a href="#cb11-72" aria-hidden="true" tabindex="-1"></a>        <span class="fu">pull</span>(Value) <span class="sc">|&gt;</span> </span>
-<span id="cb11-73"><a href="#cb11-73" aria-hidden="true" tabindex="-1"></a>        <span class="fu">str_replace_all</span>(<span class="st">","</span>, <span class="st">""</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-74"><a href="#cb11-74" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>()</span>
-<span id="cb11-75"><a href="#cb11-75" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb11-76"><a href="#cb11-76" aria-hidden="true" tabindex="-1"></a>    PRIMARY <span class="ot">&lt;-</span> TABLE <span class="sc">|&gt;</span> </span>
-<span id="cb11-77"><a href="#cb11-77" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(Item <span class="sc">==</span> <span class="st">"primary energy source"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb11-78"><a href="#cb11-78" aria-hidden="true" tabindex="-1"></a>        <span class="fu">pull</span>(Rank)</span>
-<span id="cb11-79"><a href="#cb11-79" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb11-80"><a href="#cb11-80" aria-hidden="true" tabindex="-1"></a>    RATE <span class="ot">&lt;-</span> TABLE <span class="sc">|&gt;</span></span>
-<span id="cb11-81"><a href="#cb11-81" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(Item <span class="sc">==</span> <span class="st">"average retail price (cents/kwh)"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-82"><a href="#cb11-82" aria-hidden="true" tabindex="-1"></a>        <span class="fu">pull</span>(Value) <span class="sc">|&gt;</span></span>
-<span id="cb11-83"><a href="#cb11-83" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>()</span>
-<span id="cb11-84"><a href="#cb11-84" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb11-85"><a href="#cb11-85" aria-hidden="true" tabindex="-1"></a>    GENERATION_MWh <span class="ot">&lt;-</span> TABLE <span class="sc">|&gt;</span></span>
-<span id="cb11-86"><a href="#cb11-86" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(Item <span class="sc">==</span> <span class="st">"net generation (megawatthours)"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-87"><a href="#cb11-87" aria-hidden="true" tabindex="-1"></a>        <span class="fu">pull</span>(Value) <span class="sc">|&gt;</span></span>
-<span id="cb11-88"><a href="#cb11-88" aria-hidden="true" tabindex="-1"></a>        <span class="fu">str_replace_all</span>(<span class="st">","</span>, <span class="st">""</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>()</span>
-<span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb11-91"><a href="#cb11-91" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(<span class="at">CO2_MWh               =</span> CO2_MWh, </span>
-<span id="cb11-92"><a href="#cb11-92" aria-hidden="true" tabindex="-1"></a>               <span class="at">primary_source        =</span> PRIMARY,</span>
-<span id="cb11-93"><a href="#cb11-93" aria-hidden="true" tabindex="-1"></a>               <span class="at">electricity_price_MWh =</span> RATE <span class="sc">*</span> <span class="dv">10</span>, <span class="co"># / 100 cents to dollars &amp;</span></span>
-<span id="cb11-94"><a href="#cb11-94" aria-hidden="true" tabindex="-1"></a>               <span class="co"># * 1000 kWh to MWH </span></span>
-<span id="cb11-95"><a href="#cb11-95" aria-hidden="true" tabindex="-1"></a>               <span class="at">generation_MWh        =</span> GENERATION_MWh, </span>
-<span id="cb11-96"><a href="#cb11-96" aria-hidden="true" tabindex="-1"></a>               <span class="at">state                 =</span> state, </span>
-<span id="cb11-97"><a href="#cb11-97" aria-hidden="true" tabindex="-1"></a>               <span class="at">abbreviation          =</span> abbr</span>
-<span id="cb11-98"><a href="#cb11-98" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb11-99"><a href="#cb11-99" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb11-100"><a href="#cb11-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-101"><a href="#cb11-101" aria-hidden="true" tabindex="-1"></a>EIA_SEP_REPORT <span class="ot">&lt;-</span> <span class="fu">map2</span>(state.name, state.abb, get_eia_sep) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>()</span>
-<span id="cb11-102"><a href="#cb11-102" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb11-103"><a href="#cb11-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-104"><a href="#cb11-104" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Energy Consumption (NTD Energy Usage)</span></span>
-<span id="cb11-107"><a href="#cb11-107" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb11-108"><a href="#cb11-108" aria-hidden="true" tabindex="-1"></a>load_ntd_energy <span class="ot">&lt;-</span> <span class="cf">function</span>(){</span>
-<span id="cb11-109"><a href="#cb11-109" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(readxl)</span>
-<span id="cb11-110"><a href="#cb11-110" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(httr2)</span>
-<span id="cb11-111"><a href="#cb11-111" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(tidyverse)</span>
-<span id="cb11-112"><a href="#cb11-112" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(fs)</span>
-<span id="cb11-113"><a href="#cb11-113" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb11-114"><a href="#cb11-114" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create 'data/mp02' directory if not already present</span></span>
-<span id="cb11-115"><a href="#cb11-115" aria-hidden="true" tabindex="-1"></a>  DATA_DIR <span class="ot">&lt;-</span> fs<span class="sc">::</span><span class="fu">path</span>(<span class="st">"data"</span>, <span class="st">"mp02"</span>)</span>
-<span id="cb11-116"><a href="#cb11-116" aria-hidden="true" tabindex="-1"></a>  fs<span class="sc">::</span><span class="fu">dir_create</span>(DATA_DIR, <span class="at">recurse=</span><span class="cn">TRUE</span>)</span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="sc">!</span>fs<span class="sc">::</span><span class="fu">file_exists</span>(file_name)){</span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>        BASE_URL <span class="ot">&lt;-</span> <span class="st">"https://www.eia.gov"</span></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>        RESPONSE <span class="ot">&lt;-</span> <span class="fu">request</span>(BASE_URL) <span class="sc">|&gt;</span> </span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>          <span class="fu">req_url_path</span>(<span class="st">"electricity"</span>, </span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"state"</span>, </span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a>                       state_formatted) <span class="sc">|&gt;</span></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>          <span class="fu">req_headers</span>(</span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a>            <span class="st">`</span><span class="at">User-Agent</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:149.0) Gecko/20100101 Firefox/149.0"</span></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>            ) <span class="sc">|&gt;</span>   </span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a>          <span class="fu">req_retry</span>(</span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a>                <span class="at">max_tries =</span> <span class="dv">4</span>, </span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>          ) <span class="sc">|&gt;</span></span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a>          <span class="fu">req_perform</span>(file_name)</span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>        <span class="fu">resp_check_status</span>(RESPONSE)</span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>    TABLE <span class="ot">&lt;-</span> <span class="fu">read_html</span>(file_name) <span class="sc">|&gt;</span> </span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a>        <span class="fu">html_element</span>(<span class="st">"table"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a>        <span class="fu">html_table</span>() <span class="sc">|&gt;</span></span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">Item =</span> <span class="fu">str_to_lower</span>(Item))</span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="st">"U.S. rank"</span> <span class="sc">%in%</span> <span class="fu">colnames</span>(TABLE)){</span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a>        TABLE <span class="ot">&lt;-</span> TABLE <span class="sc">|&gt;</span> <span class="fu">rename</span>(<span class="at">Rank =</span> <span class="st">`</span><span class="at">U.S. rank</span><span class="st">`</span>)</span>
+<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a>    CO2_MWh <span class="ot">&lt;-</span> TABLE <span class="sc">|&gt;</span> </span>
+<span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(Item <span class="sc">==</span> <span class="st">"carbon dioxide (lbs/mwh)"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-70"><a href="#cb11-70" aria-hidden="true" tabindex="-1"></a>        <span class="fu">pull</span>(Value) <span class="sc">|&gt;</span> </span>
+<span id="cb11-71"><a href="#cb11-71" aria-hidden="true" tabindex="-1"></a>        <span class="fu">str_replace_all</span>(<span class="st">","</span>, <span class="st">""</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-72"><a href="#cb11-72" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>()</span>
+<span id="cb11-73"><a href="#cb11-73" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-74"><a href="#cb11-74" aria-hidden="true" tabindex="-1"></a>    PRIMARY <span class="ot">&lt;-</span> TABLE <span class="sc">|&gt;</span> </span>
+<span id="cb11-75"><a href="#cb11-75" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(Item <span class="sc">==</span> <span class="st">"primary energy source"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb11-76"><a href="#cb11-76" aria-hidden="true" tabindex="-1"></a>        <span class="fu">pull</span>(Rank)</span>
+<span id="cb11-77"><a href="#cb11-77" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-78"><a href="#cb11-78" aria-hidden="true" tabindex="-1"></a>    RATE <span class="ot">&lt;-</span> TABLE <span class="sc">|&gt;</span></span>
+<span id="cb11-79"><a href="#cb11-79" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(Item <span class="sc">==</span> <span class="st">"average retail price (cents/kwh)"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-80"><a href="#cb11-80" aria-hidden="true" tabindex="-1"></a>        <span class="fu">pull</span>(Value) <span class="sc">|&gt;</span></span>
+<span id="cb11-81"><a href="#cb11-81" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>()</span>
+<span id="cb11-82"><a href="#cb11-82" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-83"><a href="#cb11-83" aria-hidden="true" tabindex="-1"></a>    GENERATION_MWh <span class="ot">&lt;-</span> TABLE <span class="sc">|&gt;</span></span>
+<span id="cb11-84"><a href="#cb11-84" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(Item <span class="sc">==</span> <span class="st">"net generation (megawatthours)"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-85"><a href="#cb11-85" aria-hidden="true" tabindex="-1"></a>        <span class="fu">pull</span>(Value) <span class="sc">|&gt;</span></span>
+<span id="cb11-86"><a href="#cb11-86" aria-hidden="true" tabindex="-1"></a>        <span class="fu">str_replace_all</span>(<span class="st">","</span>, <span class="st">""</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-87"><a href="#cb11-87" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>()</span>
+<span id="cb11-88"><a href="#cb11-88" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(<span class="at">CO2_MWh               =</span> CO2_MWh, </span>
+<span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a>               <span class="at">primary_source        =</span> PRIMARY,</span>
+<span id="cb11-91"><a href="#cb11-91" aria-hidden="true" tabindex="-1"></a>               <span class="at">electricity_price_MWh =</span> RATE <span class="sc">*</span> <span class="dv">10</span>, <span class="co"># / 100 cents to dollars &amp;</span></span>
+<span id="cb11-92"><a href="#cb11-92" aria-hidden="true" tabindex="-1"></a>               <span class="co"># * 1000 kWh to MWH </span></span>
+<span id="cb11-93"><a href="#cb11-93" aria-hidden="true" tabindex="-1"></a>               <span class="at">generation_MWh        =</span> GENERATION_MWh, </span>
+<span id="cb11-94"><a href="#cb11-94" aria-hidden="true" tabindex="-1"></a>               <span class="at">state                 =</span> state, </span>
+<span id="cb11-95"><a href="#cb11-95" aria-hidden="true" tabindex="-1"></a>               <span class="at">abbreviation          =</span> abbr</span>
+<span id="cb11-96"><a href="#cb11-96" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb11-97"><a href="#cb11-97" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-98"><a href="#cb11-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-99"><a href="#cb11-99" aria-hidden="true" tabindex="-1"></a>EIA_SEP_REPORT <span class="ot">&lt;-</span> <span class="fu">map2</span>(state.name, state.abb, get_eia_sep) <span class="sc">|&gt;</span> <span class="fu">list_rbind</span>()</span>
+<span id="cb11-100"><a href="#cb11-100" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-101"><a href="#cb11-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-102"><a href="#cb11-102" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Energy Consumption (NTD Energy Usage)</span></span>
+<span id="cb11-105"><a href="#cb11-105" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-106"><a href="#cb11-106" aria-hidden="true" tabindex="-1"></a>load_ntd_energy <span class="ot">&lt;-</span> <span class="cf">function</span>(){</span>
+<span id="cb11-107"><a href="#cb11-107" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(readxl)</span>
+<span id="cb11-108"><a href="#cb11-108" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(httr2)</span>
+<span id="cb11-109"><a href="#cb11-109" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(tidyverse)</span>
+<span id="cb11-110"><a href="#cb11-110" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(fs)</span>
+<span id="cb11-111"><a href="#cb11-111" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-112"><a href="#cb11-112" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create 'data/mp02' directory if not already present</span></span>
+<span id="cb11-113"><a href="#cb11-113" aria-hidden="true" tabindex="-1"></a>  DATA_DIR <span class="ot">&lt;-</span> fs<span class="sc">::</span><span class="fu">path</span>(<span class="st">"data"</span>, <span class="st">"mp02"</span>)</span>
+<span id="cb11-114"><a href="#cb11-114" aria-hidden="true" tabindex="-1"></a>  fs<span class="sc">::</span><span class="fu">dir_create</span>(DATA_DIR, <span class="at">recurse=</span><span class="cn">TRUE</span>)</span>
+<span id="cb11-115"><a href="#cb11-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-116"><a href="#cb11-116" aria-hidden="true" tabindex="-1"></a>  NTD_ENERGY_FILE <span class="ot">&lt;-</span> fs<span class="sc">::</span><span class="fu">path</span>(DATA_DIR, <span class="st">"2025_ntd_energy.xlsx"</span>)</span>
 <span id="cb11-117"><a href="#cb11-117" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-118"><a href="#cb11-118" aria-hidden="true" tabindex="-1"></a>  NTD_ENERGY_FILE <span class="ot">&lt;-</span> fs<span class="sc">::</span><span class="fu">path</span>(DATA_DIR, <span class="st">"2025_ntd_energy.xlsx"</span>)</span>
-<span id="cb11-119"><a href="#cb11-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-120"><a href="#cb11-120" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span>fs<span class="sc">::</span><span class="fu">file_exists</span>(NTD_ENERGY_FILE)){</span>
-<span id="cb11-121"><a href="#cb11-121" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(httr2)</span>
-<span id="cb11-122"><a href="#cb11-122" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb11-123"><a href="#cb11-123" aria-hidden="true" tabindex="-1"></a>    <span class="fu">request</span>(<span class="st">"https://www.transit.dot.gov/"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-124"><a href="#cb11-124" aria-hidden="true" tabindex="-1"></a>      <span class="fu">req_url_path</span>(<span class="st">"sites"</span>,</span>
-<span id="cb11-125"><a href="#cb11-125" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"fta.dot.gov"</span>,</span>
-<span id="cb11-126"><a href="#cb11-126" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"files"</span>,</span>
-<span id="cb11-127"><a href="#cb11-127" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"2026-09"</span>,</span>
-<span id="cb11-128"><a href="#cb11-128" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"2025 Energy Consumption_260806.xlsx"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb11-129"><a href="#cb11-129" aria-hidden="true" tabindex="-1"></a>      <span class="fu">req_headers</span>(</span>
-<span id="cb11-130"><a href="#cb11-130" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">User-Agent</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:149.0) Gecko/20100101 Firefox/149.0"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb11-131"><a href="#cb11-131" aria-hidden="true" tabindex="-1"></a>      <span class="fu">req_perform</span>(NTD_ENERGY_FILE)</span>
-<span id="cb11-132"><a href="#cb11-132" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb11-133"><a href="#cb11-133" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb11-134"><a href="#cb11-134" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">file.info</span>(NTD_ENERGY_FILE)<span class="sc">$</span>size <span class="sc">&lt;</span> <span class="fl">1e4</span>){</span>
-<span id="cb11-135"><a href="#cb11-135" aria-hidden="true" tabindex="-1"></a>        <span class="fu">cat</span>(<span class="st">"I was unable to download the NTD Energy File. Please try again.</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb11-136"><a href="#cb11-136" aria-hidden="true" tabindex="-1"></a>        <span class="fu">stop</span>(<span class="st">"Download failed. Please delete the corrupted file by running `unlink('data/mp02/2025_ntd_energy.xlsx')` and try again."</span>)</span>
-<span id="cb11-137"><a href="#cb11-137" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb11-138"><a href="#cb11-138" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-139"><a href="#cb11-139" aria-hidden="true" tabindex="-1"></a>  to_numeric_fill_0 <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
-<span id="cb11-140"><a href="#cb11-140" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">if_else</span>(x <span class="sc">==</span> <span class="st">"-"</span>, <span class="cn">NA</span>, x)</span>
-<span id="cb11-141"><a href="#cb11-141" aria-hidden="true" tabindex="-1"></a>    <span class="fu">replace_na</span>(<span class="fu">as.numeric</span>(x), <span class="dv">0</span>)</span>
-<span id="cb11-142"><a href="#cb11-142" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb11-143"><a href="#cb11-143" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-144"><a href="#cb11-144" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_excel</span>(NTD_ENERGY_FILE) <span class="sc">|&gt;</span> </span>
-<span id="cb11-145"><a href="#cb11-145" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">`</span><span class="at">Reporter Type</span><span class="st">`</span>, </span>
-<span id="cb11-146"><a href="#cb11-146" aria-hidden="true" tabindex="-1"></a>              <span class="st">`</span><span class="at">Reporting Module</span><span class="st">`</span>, </span>
-<span id="cb11-147"><a href="#cb11-147" aria-hidden="true" tabindex="-1"></a>              <span class="st">`</span><span class="at">Gallons of Other Fuel</span><span class="st">`</span>, </span>
-<span id="cb11-148"><a href="#cb11-148" aria-hidden="true" tabindex="-1"></a>              <span class="st">`</span><span class="at">Other Fuel Description</span><span class="st">`</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb11-149"><a href="#cb11-149" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">`</span><span class="at">Agency Name</span><span class="st">`</span>, </span>
-<span id="cb11-150"><a href="#cb11-150" aria-hidden="true" tabindex="-1"></a>                     <span class="st">`</span><span class="at">Mode</span><span class="st">`</span>,</span>
-<span id="cb11-151"><a href="#cb11-151" aria-hidden="true" tabindex="-1"></a>                     <span class="st">`</span><span class="at">TOS</span><span class="st">`</span>), </span>
-<span id="cb11-152"><a href="#cb11-152" aria-hidden="true" tabindex="-1"></a>                  to_numeric_fill_0)) <span class="sc">|&gt;</span></span>
-<span id="cb11-153"><a href="#cb11-153" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(<span class="st">`</span><span class="at">NTD ID</span><span class="st">`</span>, <span class="st">`</span><span class="at">Mode</span><span class="st">`</span>, <span class="st">`</span><span class="at">Agency Name</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-154"><a href="#cb11-154" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), sum), </span>
-<span id="cb11-155"><a href="#cb11-155" aria-hidden="true" tabindex="-1"></a>              <span class="at">.groups =</span> <span class="st">"keep"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-156"><a href="#cb11-156" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">ENERGY =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(<span class="fu">c</span>(<span class="fu">where</span>(is.numeric))))) <span class="sc">|&gt;</span></span>
-<span id="cb11-157"><a href="#cb11-157" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(ENERGY <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-158"><a href="#cb11-158" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>ENERGY) <span class="sc">|&gt;</span></span>
-<span id="cb11-159"><a href="#cb11-159" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>()</span>
-<span id="cb11-160"><a href="#cb11-160" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb11-161"><a href="#cb11-161" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-162"><a href="#cb11-162" aria-hidden="true" tabindex="-1"></a>NTD_ENERGY <span class="ot">&lt;-</span> <span class="fu">load_ntd_energy</span>()</span>
-<span id="cb11-163"><a href="#cb11-163" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-118"><a href="#cb11-118" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span>fs<span class="sc">::</span><span class="fu">file_exists</span>(NTD_ENERGY_FILE)){</span>
+<span id="cb11-119"><a href="#cb11-119" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(httr2)</span>
+<span id="cb11-120"><a href="#cb11-120" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-121"><a href="#cb11-121" aria-hidden="true" tabindex="-1"></a>    <span class="fu">request</span>(<span class="st">"https://www.transit.dot.gov/"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-122"><a href="#cb11-122" aria-hidden="true" tabindex="-1"></a>      <span class="fu">req_url_path</span>(<span class="st">"sites"</span>,</span>
+<span id="cb11-123"><a href="#cb11-123" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"fta.dot.gov"</span>,</span>
+<span id="cb11-124"><a href="#cb11-124" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"files"</span>,</span>
+<span id="cb11-125"><a href="#cb11-125" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"2026-09"</span>,</span>
+<span id="cb11-126"><a href="#cb11-126" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"2025 Energy Consumption_260806.xlsx"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb11-127"><a href="#cb11-127" aria-hidden="true" tabindex="-1"></a>      <span class="fu">req_headers</span>(</span>
+<span id="cb11-128"><a href="#cb11-128" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">User-Agent</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:149.0) Gecko/20100101 Firefox/149.0"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb11-129"><a href="#cb11-129" aria-hidden="true" tabindex="-1"></a>      <span class="fu">req_perform</span>(NTD_ENERGY_FILE)</span>
+<span id="cb11-130"><a href="#cb11-130" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-131"><a href="#cb11-131" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-132"><a href="#cb11-132" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">file.info</span>(NTD_ENERGY_FILE)<span class="sc">$</span>size <span class="sc">&lt;</span> <span class="fl">1e4</span>){</span>
+<span id="cb11-133"><a href="#cb11-133" aria-hidden="true" tabindex="-1"></a>        <span class="fu">cat</span>(<span class="st">"I was unable to download the NTD Energy File. Please try again.</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb11-134"><a href="#cb11-134" aria-hidden="true" tabindex="-1"></a>        <span class="fu">stop</span>(<span class="st">"Download failed. Please delete the corrupted file by running `unlink('data/mp02/2025_ntd_energy.xlsx')` and try again."</span>)</span>
+<span id="cb11-135"><a href="#cb11-135" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb11-136"><a href="#cb11-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-137"><a href="#cb11-137" aria-hidden="true" tabindex="-1"></a>  to_numeric_fill_0 <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
+<span id="cb11-138"><a href="#cb11-138" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">if_else</span>(x <span class="sc">==</span> <span class="st">"-"</span>, <span class="cn">NA</span>, x)</span>
+<span id="cb11-139"><a href="#cb11-139" aria-hidden="true" tabindex="-1"></a>    <span class="fu">replace_na</span>(<span class="fu">as.numeric</span>(x), <span class="dv">0</span>)</span>
+<span id="cb11-140"><a href="#cb11-140" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-141"><a href="#cb11-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-142"><a href="#cb11-142" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_excel</span>(NTD_ENERGY_FILE) <span class="sc">|&gt;</span> </span>
+<span id="cb11-143"><a href="#cb11-143" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">`</span><span class="at">Reporter Type</span><span class="st">`</span>, </span>
+<span id="cb11-144"><a href="#cb11-144" aria-hidden="true" tabindex="-1"></a>              <span class="st">`</span><span class="at">Reporting Module</span><span class="st">`</span>, </span>
+<span id="cb11-145"><a href="#cb11-145" aria-hidden="true" tabindex="-1"></a>              <span class="st">`</span><span class="at">Gallons of Other Fuel</span><span class="st">`</span>, </span>
+<span id="cb11-146"><a href="#cb11-146" aria-hidden="true" tabindex="-1"></a>              <span class="st">`</span><span class="at">Other Fuel Description</span><span class="st">`</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb11-147"><a href="#cb11-147" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">`</span><span class="at">Agency Name</span><span class="st">`</span>, </span>
+<span id="cb11-148"><a href="#cb11-148" aria-hidden="true" tabindex="-1"></a>                     <span class="st">`</span><span class="at">Mode</span><span class="st">`</span>,</span>
+<span id="cb11-149"><a href="#cb11-149" aria-hidden="true" tabindex="-1"></a>                     <span class="st">`</span><span class="at">TOS</span><span class="st">`</span>), </span>
+<span id="cb11-150"><a href="#cb11-150" aria-hidden="true" tabindex="-1"></a>                  to_numeric_fill_0)) <span class="sc">|&gt;</span></span>
+<span id="cb11-151"><a href="#cb11-151" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(<span class="st">`</span><span class="at">NTD ID</span><span class="st">`</span>, <span class="st">`</span><span class="at">Mode</span><span class="st">`</span>, <span class="st">`</span><span class="at">Agency Name</span><span class="st">`</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-152"><a href="#cb11-152" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), sum), </span>
+<span id="cb11-153"><a href="#cb11-153" aria-hidden="true" tabindex="-1"></a>              <span class="at">.groups =</span> <span class="st">"keep"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-154"><a href="#cb11-154" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">ENERGY =</span> <span class="fu">sum</span>(<span class="fu">c_across</span>(<span class="fu">c</span>(<span class="fu">where</span>(is.numeric))))) <span class="sc">|&gt;</span></span>
+<span id="cb11-155"><a href="#cb11-155" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(ENERGY <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-156"><a href="#cb11-156" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>ENERGY) <span class="sc">|&gt;</span></span>
+<span id="cb11-157"><a href="#cb11-157" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>()</span>
+<span id="cb11-158"><a href="#cb11-158" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-159"><a href="#cb11-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-160"><a href="#cb11-160" aria-hidden="true" tabindex="-1"></a>NTD_ENERGY <span class="ot">&lt;-</span> <span class="fu">load_ntd_energy</span>()</span>
+<span id="cb11-161"><a href="#cb11-161" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-162"><a href="#cb11-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-163"><a href="#cb11-163" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Transit Service Provided</span></span>
 <span id="cb11-164"><a href="#cb11-164" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-165"><a href="#cb11-165" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Transit Service Provided</span></span>
-<span id="cb11-166"><a href="#cb11-166" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-169"><a href="#cb11-169" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb11-170"><a href="#cb11-170" aria-hidden="true" tabindex="-1"></a>load_ntd_service <span class="ot">&lt;-</span> <span class="cf">function</span>(){</span>
-<span id="cb11-171"><a href="#cb11-171" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(httr2)</span>
-<span id="cb11-172"><a href="#cb11-172" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(tidyverse)</span>
-<span id="cb11-173"><a href="#cb11-173" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(fs)</span>
-<span id="cb11-174"><a href="#cb11-174" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb11-175"><a href="#cb11-175" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create 'data/mp02' directory if not already present</span></span>
-<span id="cb11-176"><a href="#cb11-176" aria-hidden="true" tabindex="-1"></a>  DATA_DIR <span class="ot">&lt;-</span> fs<span class="sc">::</span><span class="fu">path</span>(<span class="st">"data"</span>, <span class="st">"mp02"</span>)</span>
-<span id="cb11-177"><a href="#cb11-177" aria-hidden="true" tabindex="-1"></a>  fs<span class="sc">::</span><span class="fu">dir_create</span>(DATA_DIR, <span class="at">recurse=</span><span class="cn">TRUE</span>)</span>
+<span id="cb11-167"><a href="#cb11-167" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-168"><a href="#cb11-168" aria-hidden="true" tabindex="-1"></a>load_ntd_service <span class="ot">&lt;-</span> <span class="cf">function</span>(){</span>
+<span id="cb11-169"><a href="#cb11-169" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(httr2)</span>
+<span id="cb11-170"><a href="#cb11-170" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(tidyverse)</span>
+<span id="cb11-171"><a href="#cb11-171" aria-hidden="true" tabindex="-1"></a>  <span class="fu">library</span>(fs)</span>
+<span id="cb11-172"><a href="#cb11-172" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-173"><a href="#cb11-173" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create 'data/mp02' directory if not already present</span></span>
+<span id="cb11-174"><a href="#cb11-174" aria-hidden="true" tabindex="-1"></a>  DATA_DIR <span class="ot">&lt;-</span> fs<span class="sc">::</span><span class="fu">path</span>(<span class="st">"data"</span>, <span class="st">"mp02"</span>)</span>
+<span id="cb11-175"><a href="#cb11-175" aria-hidden="true" tabindex="-1"></a>  fs<span class="sc">::</span><span class="fu">dir_create</span>(DATA_DIR, <span class="at">recurse=</span><span class="cn">TRUE</span>)</span>
+<span id="cb11-176"><a href="#cb11-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-177"><a href="#cb11-177" aria-hidden="true" tabindex="-1"></a>  NTD_SERVICE_FILE <span class="ot">&lt;-</span> fs<span class="sc">::</span><span class="fu">path</span>(DATA_DIR, <span class="st">"2025_ntd_service.csv"</span>)</span>
 <span id="cb11-178"><a href="#cb11-178" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-179"><a href="#cb11-179" aria-hidden="true" tabindex="-1"></a>  NTD_SERVICE_FILE <span class="ot">&lt;-</span> fs<span class="sc">::</span><span class="fu">path</span>(DATA_DIR, <span class="st">"2025_ntd_service.csv"</span>)</span>
-<span id="cb11-180"><a href="#cb11-180" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-181"><a href="#cb11-181" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span>fs<span class="sc">::</span><span class="fu">file_exists</span>(NTD_SERVICE_FILE)){</span>
-<span id="cb11-182"><a href="#cb11-182" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(httr2)</span>
-<span id="cb11-183"><a href="#cb11-183" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb11-184"><a href="#cb11-184" aria-hidden="true" tabindex="-1"></a>    <span class="fu">request</span>(<span class="st">"https://data.transportation.gov/resource/4fir-qbim.csv"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-185"><a href="#cb11-185" aria-hidden="true" tabindex="-1"></a>      <span class="fu">req_url_query</span>(<span class="st">`</span><span class="at">$query</span><span class="st">`</span><span class="ot">=</span><span class="fu">paste</span>(</span>
-<span id="cb11-186"><a href="#cb11-186" aria-hidden="true" tabindex="-1"></a>        <span class="st">"SELECT  `_5_digit_ntd_id` AS `NTD_ID`"</span>, </span>
-<span id="cb11-187"><a href="#cb11-187" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_agency` AS `AGENCY`"</span>,</span>
-<span id="cb11-188"><a href="#cb11-188" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_reporter_type` AS `reporter_type`"</span>,</span>
-<span id="cb11-189"><a href="#cb11-189" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_organization_type` AS `organization_type`"</span>,</span>
-<span id="cb11-190"><a href="#cb11-190" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_city` AS `city`"</span>,</span>
-<span id="cb11-191"><a href="#cb11-191" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_state` AS `state`"</span>,</span>
-<span id="cb11-192"><a href="#cb11-192" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`mode`"</span>,</span>
-<span id="cb11-193"><a href="#cb11-193" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`type_of_service`"</span>,</span>
-<span id="cb11-194"><a href="#cb11-194" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_primary_uza_code` as `uza_code`"</span>,</span>
-<span id="cb11-195"><a href="#cb11-195" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_primary_uza_name` as `uza_name`"</span>,</span>
-<span id="cb11-196"><a href="#cb11-196" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_primary_uza_area_sq_miles` as `uza_sq_miles`"</span>,</span>
-<span id="cb11-197"><a href="#cb11-197" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_primary_uza_population` as `uza_population`"</span>,</span>
-<span id="cb11-198"><a href="#cb11-198" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_service_area_sq_miles` as `service_area_sq_miles`"</span>,</span>
-<span id="cb11-199"><a href="#cb11-199" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_service_area_population` as `service_area_population`"</span>,</span>
-<span id="cb11-200"><a href="#cb11-200" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`questionable_record` as `flagged_likely_inaccurate`"</span>,</span>
-<span id="cb11-201"><a href="#cb11-201" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`sum_unlinked_passenger_trips_upt` as `total_upt`"</span>,</span>
-<span id="cb11-202"><a href="#cb11-202" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`sum_passenger_miles` WHERE caseless_one_of(`report_year`, '2025') limit 50000"</span>, </span>
-<span id="cb11-203"><a href="#cb11-203" aria-hidden="true" tabindex="-1"></a>        <span class="at">sep=</span><span class="st">","</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb11-204"><a href="#cb11-204" aria-hidden="true" tabindex="-1"></a>      <span class="fu">req_headers</span>(</span>
-<span id="cb11-205"><a href="#cb11-205" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">User-Agent</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:149.0) Gecko/20100101 Firefox/149.0"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb11-206"><a href="#cb11-206" aria-hidden="true" tabindex="-1"></a>      <span class="fu">req_perform</span>(NTD_SERVICE_FILE)</span>
-<span id="cb11-207"><a href="#cb11-207" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb11-208"><a href="#cb11-208" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb11-209"><a href="#cb11-209" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">file.info</span>(NTD_SERVICE_FILE)<span class="sc">$</span>size <span class="sc">&lt;</span> <span class="fl">1e4</span>){</span>
-<span id="cb11-210"><a href="#cb11-210" aria-hidden="true" tabindex="-1"></a>        <span class="fu">cat</span>(<span class="st">"I was unable to download the NTD Service File. Please try again.</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb11-211"><a href="#cb11-211" aria-hidden="true" tabindex="-1"></a>        <span class="fu">stop</span>(<span class="st">"Download failed. Please delete the corrupted file by running `unlink('data/mp02/2025_ntd_service.xlsx')` and try again."</span>)</span>
-<span id="cb11-212"><a href="#cb11-212" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb11-213"><a href="#cb11-213" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-214"><a href="#cb11-214" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_csv</span>(NTD_SERVICE_FILE) <span class="sc">|&gt;</span></span>
-<span id="cb11-215"><a href="#cb11-215" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">flagged_likely_inaccurate =</span> <span class="sc">!</span><span class="fu">is.na</span>(flagged_likely_inaccurate))</span>
-<span id="cb11-216"><a href="#cb11-216" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb11-217"><a href="#cb11-217" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-218"><a href="#cb11-218" aria-hidden="true" tabindex="-1"></a>NTD_SERVICE <span class="ot">&lt;-</span> <span class="fu">load_ntd_service</span>()</span>
-<span id="cb11-219"><a href="#cb11-219" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb11-220"><a href="#cb11-220" aria-hidden="true" tabindex="-1"></a><span class="fu">## Recoding the Mode Column</span></span>
-<span id="cb11-223"><a href="#cb11-223" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb11-224"><a href="#cb11-224" aria-hidden="true" tabindex="-1"></a><span class="co"># List the unique transit mode codes used in the energy data</span></span>
-<span id="cb11-225"><a href="#cb11-225" aria-hidden="true" tabindex="-1"></a>NTD_ENERGY <span class="sc">|&gt;</span> <span class="fu">distinct</span>(Mode)</span>
-<span id="cb11-226"><a href="#cb11-226" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-227"><a href="#cb11-227" aria-hidden="true" tabindex="-1"></a><span class="co"># Translate NTD's two-letter mode codes into readable names.</span></span>
-<span id="cb11-228"><a href="#cb11-228" aria-hidden="true" tabindex="-1"></a><span class="co"># Codes and meanings come from the NTD glossary.</span></span>
-<span id="cb11-229"><a href="#cb11-229" aria-hidden="true" tabindex="-1"></a>recode_mode <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb11-230"><a href="#cb11-230" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recode_values</span>(x,</span>
-<span id="cb11-231"><a href="#cb11-231" aria-hidden="true" tabindex="-1"></a>    <span class="st">"AR"</span> <span class="sc">~</span> <span class="st">"Alaska Railroad"</span>,</span>
-<span id="cb11-232"><a href="#cb11-232" aria-hidden="true" tabindex="-1"></a>    <span class="st">"CB"</span> <span class="sc">~</span> <span class="st">"Commuter Bus"</span>,</span>
-<span id="cb11-233"><a href="#cb11-233" aria-hidden="true" tabindex="-1"></a>    <span class="st">"CC"</span> <span class="sc">~</span> <span class="st">"Cable Car"</span>,</span>
-<span id="cb11-234"><a href="#cb11-234" aria-hidden="true" tabindex="-1"></a>    <span class="st">"CR"</span> <span class="sc">~</span> <span class="st">"Commuter Rail"</span>,</span>
-<span id="cb11-235"><a href="#cb11-235" aria-hidden="true" tabindex="-1"></a>    <span class="st">"DR"</span> <span class="sc">~</span> <span class="st">"Demand Response"</span>,</span>
-<span id="cb11-236"><a href="#cb11-236" aria-hidden="true" tabindex="-1"></a>    <span class="st">"DT"</span> <span class="sc">~</span> <span class="st">"Demand Response Taxi"</span>,</span>
-<span id="cb11-237"><a href="#cb11-237" aria-hidden="true" tabindex="-1"></a>    <span class="st">"FB"</span> <span class="sc">~</span> <span class="st">"Ferryboat"</span>,</span>
-<span id="cb11-238"><a href="#cb11-238" aria-hidden="true" tabindex="-1"></a>    <span class="st">"HR"</span> <span class="sc">~</span> <span class="st">"Heavy Rail"</span>,</span>
-<span id="cb11-239"><a href="#cb11-239" aria-hidden="true" tabindex="-1"></a>    <span class="st">"IP"</span> <span class="sc">~</span> <span class="st">"Inclined Plane"</span>,</span>
-<span id="cb11-240"><a href="#cb11-240" aria-hidden="true" tabindex="-1"></a>    <span class="st">"JT"</span> <span class="sc">~</span> <span class="st">"Jitney"</span>,</span>
-<span id="cb11-241"><a href="#cb11-241" aria-hidden="true" tabindex="-1"></a>    <span class="st">"LR"</span> <span class="sc">~</span> <span class="st">"Light Rail"</span>,</span>
-<span id="cb11-242"><a href="#cb11-242" aria-hidden="true" tabindex="-1"></a>    <span class="st">"MB"</span> <span class="sc">~</span> <span class="st">"Bus"</span>,</span>
-<span id="cb11-243"><a href="#cb11-243" aria-hidden="true" tabindex="-1"></a>    <span class="st">"MG"</span> <span class="sc">~</span> <span class="st">"Monorail/Automated Guideway"</span>,</span>
-<span id="cb11-244"><a href="#cb11-244" aria-hidden="true" tabindex="-1"></a>    <span class="st">"OR"</span> <span class="sc">~</span> <span class="st">"Other Rail"</span>,</span>
-<span id="cb11-245"><a href="#cb11-245" aria-hidden="true" tabindex="-1"></a>    <span class="st">"PB"</span> <span class="sc">~</span> <span class="st">"Publico"</span>,</span>
-<span id="cb11-246"><a href="#cb11-246" aria-hidden="true" tabindex="-1"></a>    <span class="st">"RB"</span> <span class="sc">~</span> <span class="st">"Bus Rapid Transit"</span>,</span>
-<span id="cb11-247"><a href="#cb11-247" aria-hidden="true" tabindex="-1"></a>    <span class="st">"SR"</span> <span class="sc">~</span> <span class="st">"Streetcar Rail"</span>,</span>
-<span id="cb11-248"><a href="#cb11-248" aria-hidden="true" tabindex="-1"></a>    <span class="st">"TB"</span> <span class="sc">~</span> <span class="st">"Trolleybus"</span>,</span>
-<span id="cb11-249"><a href="#cb11-249" aria-hidden="true" tabindex="-1"></a>    <span class="st">"TR"</span> <span class="sc">~</span> <span class="st">"Aerial Tramway"</span>,</span>
-<span id="cb11-250"><a href="#cb11-250" aria-hidden="true" tabindex="-1"></a>    <span class="st">"VP"</span> <span class="sc">~</span> <span class="st">"Vanpool"</span>,</span>
-<span id="cb11-251"><a href="#cb11-251" aria-hidden="true" tabindex="-1"></a>    <span class="st">"YR"</span> <span class="sc">~</span> <span class="st">"Hybrid Rail"</span>,</span>
-<span id="cb11-252"><a href="#cb11-252" aria-hidden="true" tabindex="-1"></a>    <span class="at">default =</span> <span class="st">"Unknown"</span></span>
-<span id="cb11-253"><a href="#cb11-253" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb11-254"><a href="#cb11-254" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb11-255"><a href="#cb11-255" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-256"><a href="#cb11-256" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the same translation to both NTD tables so they still match when joined</span></span>
-<span id="cb11-257"><a href="#cb11-257" aria-hidden="true" tabindex="-1"></a>NTD_ENERGY  <span class="ot">&lt;-</span> NTD_ENERGY  <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">recode_mode</span>(Mode))</span>
-<span id="cb11-258"><a href="#cb11-258" aria-hidden="true" tabindex="-1"></a>NTD_SERVICE <span class="ot">&lt;-</span> NTD_SERVICE <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">mode =</span> <span class="fu">recode_mode</span>(mode))</span>
-<span id="cb11-259"><a href="#cb11-259" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb11-260"><a href="#cb11-260" aria-hidden="true" tabindex="-1"></a><span class="fu"># TASK 3: </span></span>
-<span id="cb11-261"><a href="#cb11-261" aria-hidden="true" tabindex="-1"></a><span class="fu">#### EDA EIA State Electricity Profiles</span></span>
+<span id="cb11-179"><a href="#cb11-179" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span>fs<span class="sc">::</span><span class="fu">file_exists</span>(NTD_SERVICE_FILE)){</span>
+<span id="cb11-180"><a href="#cb11-180" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(httr2)</span>
+<span id="cb11-181"><a href="#cb11-181" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-182"><a href="#cb11-182" aria-hidden="true" tabindex="-1"></a>    <span class="fu">request</span>(<span class="st">"https://data.transportation.gov/resource/4fir-qbim.csv"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-183"><a href="#cb11-183" aria-hidden="true" tabindex="-1"></a>      <span class="fu">req_url_query</span>(<span class="st">`</span><span class="at">$query</span><span class="st">`</span><span class="ot">=</span><span class="fu">paste</span>(</span>
+<span id="cb11-184"><a href="#cb11-184" aria-hidden="true" tabindex="-1"></a>        <span class="st">"SELECT  `_5_digit_ntd_id` AS `NTD_ID`"</span>, </span>
+<span id="cb11-185"><a href="#cb11-185" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_agency` AS `AGENCY`"</span>,</span>
+<span id="cb11-186"><a href="#cb11-186" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_reporter_type` AS `reporter_type`"</span>,</span>
+<span id="cb11-187"><a href="#cb11-187" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_organization_type` AS `organization_type`"</span>,</span>
+<span id="cb11-188"><a href="#cb11-188" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_city` AS `city`"</span>,</span>
+<span id="cb11-189"><a href="#cb11-189" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_state` AS `state`"</span>,</span>
+<span id="cb11-190"><a href="#cb11-190" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`mode`"</span>,</span>
+<span id="cb11-191"><a href="#cb11-191" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`type_of_service`"</span>,</span>
+<span id="cb11-192"><a href="#cb11-192" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_primary_uza_code` as `uza_code`"</span>,</span>
+<span id="cb11-193"><a href="#cb11-193" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_primary_uza_name` as `uza_name`"</span>,</span>
+<span id="cb11-194"><a href="#cb11-194" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_primary_uza_area_sq_miles` as `uza_sq_miles`"</span>,</span>
+<span id="cb11-195"><a href="#cb11-195" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_primary_uza_population` as `uza_population`"</span>,</span>
+<span id="cb11-196"><a href="#cb11-196" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_service_area_sq_miles` as `service_area_sq_miles`"</span>,</span>
+<span id="cb11-197"><a href="#cb11-197" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`max_service_area_population` as `service_area_population`"</span>,</span>
+<span id="cb11-198"><a href="#cb11-198" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`questionable_record` as `flagged_likely_inaccurate`"</span>,</span>
+<span id="cb11-199"><a href="#cb11-199" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`sum_unlinked_passenger_trips_upt` as `total_upt`"</span>,</span>
+<span id="cb11-200"><a href="#cb11-200" aria-hidden="true" tabindex="-1"></a>        <span class="st">"`sum_passenger_miles` WHERE caseless_one_of(`report_year`, '2025') limit 50000"</span>, </span>
+<span id="cb11-201"><a href="#cb11-201" aria-hidden="true" tabindex="-1"></a>        <span class="at">sep=</span><span class="st">","</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb11-202"><a href="#cb11-202" aria-hidden="true" tabindex="-1"></a>      <span class="fu">req_headers</span>(</span>
+<span id="cb11-203"><a href="#cb11-203" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">User-Agent</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:149.0) Gecko/20100101 Firefox/149.0"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb11-204"><a href="#cb11-204" aria-hidden="true" tabindex="-1"></a>      <span class="fu">req_perform</span>(NTD_SERVICE_FILE)</span>
+<span id="cb11-205"><a href="#cb11-205" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-206"><a href="#cb11-206" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-207"><a href="#cb11-207" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">file.info</span>(NTD_SERVICE_FILE)<span class="sc">$</span>size <span class="sc">&lt;</span> <span class="fl">1e4</span>){</span>
+<span id="cb11-208"><a href="#cb11-208" aria-hidden="true" tabindex="-1"></a>        <span class="fu">cat</span>(<span class="st">"I was unable to download the NTD Service File. Please try again.</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb11-209"><a href="#cb11-209" aria-hidden="true" tabindex="-1"></a>        <span class="fu">stop</span>(<span class="st">"Download failed. Please delete the corrupted file by running `unlink('data/mp02/2025_ntd_service.xlsx')` and try again."</span>)</span>
+<span id="cb11-210"><a href="#cb11-210" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb11-211"><a href="#cb11-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-212"><a href="#cb11-212" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_csv</span>(NTD_SERVICE_FILE) <span class="sc">|&gt;</span></span>
+<span id="cb11-213"><a href="#cb11-213" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">flagged_likely_inaccurate =</span> <span class="sc">!</span><span class="fu">is.na</span>(flagged_likely_inaccurate))</span>
+<span id="cb11-214"><a href="#cb11-214" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-215"><a href="#cb11-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-216"><a href="#cb11-216" aria-hidden="true" tabindex="-1"></a>NTD_SERVICE <span class="ot">&lt;-</span> <span class="fu">load_ntd_service</span>()</span>
+<span id="cb11-217"><a href="#cb11-217" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-218"><a href="#cb11-218" aria-hidden="true" tabindex="-1"></a><span class="fu">## Recoding the Mode Column</span></span>
+<span id="cb11-221"><a href="#cb11-221" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-222"><a href="#cb11-222" aria-hidden="true" tabindex="-1"></a><span class="co"># List the unique transit mode codes used in the energy data</span></span>
+<span id="cb11-223"><a href="#cb11-223" aria-hidden="true" tabindex="-1"></a>NTD_ENERGY <span class="sc">|&gt;</span> <span class="fu">distinct</span>(Mode)</span>
+<span id="cb11-224"><a href="#cb11-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-225"><a href="#cb11-225" aria-hidden="true" tabindex="-1"></a><span class="co"># Translate NTD's two-letter mode codes into readable names.</span></span>
+<span id="cb11-226"><a href="#cb11-226" aria-hidden="true" tabindex="-1"></a><span class="co"># Codes and meanings come from the NTD glossary.</span></span>
+<span id="cb11-227"><a href="#cb11-227" aria-hidden="true" tabindex="-1"></a>recode_mode <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb11-228"><a href="#cb11-228" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recode_values</span>(x,</span>
+<span id="cb11-229"><a href="#cb11-229" aria-hidden="true" tabindex="-1"></a>    <span class="st">"AR"</span> <span class="sc">~</span> <span class="st">"Alaska Railroad"</span>,</span>
+<span id="cb11-230"><a href="#cb11-230" aria-hidden="true" tabindex="-1"></a>    <span class="st">"CB"</span> <span class="sc">~</span> <span class="st">"Commuter Bus"</span>,</span>
+<span id="cb11-231"><a href="#cb11-231" aria-hidden="true" tabindex="-1"></a>    <span class="st">"CC"</span> <span class="sc">~</span> <span class="st">"Cable Car"</span>,</span>
+<span id="cb11-232"><a href="#cb11-232" aria-hidden="true" tabindex="-1"></a>    <span class="st">"CR"</span> <span class="sc">~</span> <span class="st">"Commuter Rail"</span>,</span>
+<span id="cb11-233"><a href="#cb11-233" aria-hidden="true" tabindex="-1"></a>    <span class="st">"DR"</span> <span class="sc">~</span> <span class="st">"Demand Response"</span>,</span>
+<span id="cb11-234"><a href="#cb11-234" aria-hidden="true" tabindex="-1"></a>    <span class="st">"DT"</span> <span class="sc">~</span> <span class="st">"Demand Response Taxi"</span>,</span>
+<span id="cb11-235"><a href="#cb11-235" aria-hidden="true" tabindex="-1"></a>    <span class="st">"FB"</span> <span class="sc">~</span> <span class="st">"Ferryboat"</span>,</span>
+<span id="cb11-236"><a href="#cb11-236" aria-hidden="true" tabindex="-1"></a>    <span class="st">"HR"</span> <span class="sc">~</span> <span class="st">"Heavy Rail"</span>,</span>
+<span id="cb11-237"><a href="#cb11-237" aria-hidden="true" tabindex="-1"></a>    <span class="st">"IP"</span> <span class="sc">~</span> <span class="st">"Inclined Plane"</span>,</span>
+<span id="cb11-238"><a href="#cb11-238" aria-hidden="true" tabindex="-1"></a>    <span class="st">"JT"</span> <span class="sc">~</span> <span class="st">"Jitney"</span>,</span>
+<span id="cb11-239"><a href="#cb11-239" aria-hidden="true" tabindex="-1"></a>    <span class="st">"LR"</span> <span class="sc">~</span> <span class="st">"Light Rail"</span>,</span>
+<span id="cb11-240"><a href="#cb11-240" aria-hidden="true" tabindex="-1"></a>    <span class="st">"MB"</span> <span class="sc">~</span> <span class="st">"Bus"</span>,</span>
+<span id="cb11-241"><a href="#cb11-241" aria-hidden="true" tabindex="-1"></a>    <span class="st">"MG"</span> <span class="sc">~</span> <span class="st">"Monorail/Automated Guideway"</span>,</span>
+<span id="cb11-242"><a href="#cb11-242" aria-hidden="true" tabindex="-1"></a>    <span class="st">"OR"</span> <span class="sc">~</span> <span class="st">"Other Rail"</span>,</span>
+<span id="cb11-243"><a href="#cb11-243" aria-hidden="true" tabindex="-1"></a>    <span class="st">"PB"</span> <span class="sc">~</span> <span class="st">"Publico"</span>,</span>
+<span id="cb11-244"><a href="#cb11-244" aria-hidden="true" tabindex="-1"></a>    <span class="st">"RB"</span> <span class="sc">~</span> <span class="st">"Bus Rapid Transit"</span>,</span>
+<span id="cb11-245"><a href="#cb11-245" aria-hidden="true" tabindex="-1"></a>    <span class="st">"SR"</span> <span class="sc">~</span> <span class="st">"Streetcar Rail"</span>,</span>
+<span id="cb11-246"><a href="#cb11-246" aria-hidden="true" tabindex="-1"></a>    <span class="st">"TB"</span> <span class="sc">~</span> <span class="st">"Trolleybus"</span>,</span>
+<span id="cb11-247"><a href="#cb11-247" aria-hidden="true" tabindex="-1"></a>    <span class="st">"TR"</span> <span class="sc">~</span> <span class="st">"Aerial Tramway"</span>,</span>
+<span id="cb11-248"><a href="#cb11-248" aria-hidden="true" tabindex="-1"></a>    <span class="st">"VP"</span> <span class="sc">~</span> <span class="st">"Vanpool"</span>,</span>
+<span id="cb11-249"><a href="#cb11-249" aria-hidden="true" tabindex="-1"></a>    <span class="st">"YR"</span> <span class="sc">~</span> <span class="st">"Hybrid Rail"</span>,</span>
+<span id="cb11-250"><a href="#cb11-250" aria-hidden="true" tabindex="-1"></a>    <span class="at">default =</span> <span class="st">"Unknown"</span></span>
+<span id="cb11-251"><a href="#cb11-251" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-252"><a href="#cb11-252" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-253"><a href="#cb11-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-254"><a href="#cb11-254" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the same translation to both NTD tables so they still match when joined</span></span>
+<span id="cb11-255"><a href="#cb11-255" aria-hidden="true" tabindex="-1"></a>NTD_ENERGY  <span class="ot">&lt;-</span> NTD_ENERGY  <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">recode_mode</span>(Mode))</span>
+<span id="cb11-256"><a href="#cb11-256" aria-hidden="true" tabindex="-1"></a>NTD_SERVICE <span class="ot">&lt;-</span> NTD_SERVICE <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">mode =</span> <span class="fu">recode_mode</span>(mode))</span>
+<span id="cb11-257"><a href="#cb11-257" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-258"><a href="#cb11-258" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exploratory Data analysis</span></span>
+<span id="cb11-259"><a href="#cb11-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-260"><a href="#cb11-260" aria-hidden="true" tabindex="-1"></a>The problem was the data had 2 letter codes and there are <span class="in">`r n_distinct(NTD_ENERGY$Mode)`</span> different ones. For anyone that is not familiar with what each means its hard to understand so I renamed the. I found them with distinct(), then built one function and used it so the two tables NTD_Energy and NTD_Service can be matched on mode later since the labels on both have to be identical. The most agency mode rows in the data set was Bus and Demand response.</span>
+<span id="cb11-261"><a href="#cb11-261" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-262"><a href="#cb11-262" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-265"><a href="#cb11-265" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb11-266"><a href="#cb11-266" aria-hidden="true" tabindex="-1"></a><span class="co"># Packages for formatted tables and number formatting</span></span>
-<span id="cb11-267"><a href="#cb11-267" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
-<span id="cb11-268"><a href="#cb11-268" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
-<span id="cb11-269"><a href="#cb11-269" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb11-270"><a href="#cb11-270" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Which 5 states have the most expensive retail electricity? (Graph)</span>
-<span id="cb11-273"><a href="#cb11-273" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb11-274"><a href="#cb11-274" aria-hidden="true" tabindex="-1"></a><span class="co"># The 5 states with the highest average retail electricity price</span></span>
-<span id="cb11-275"><a href="#cb11-275" aria-hidden="true" tabindex="-1"></a>expensive_states <span class="ot">&lt;-</span> EIA_SEP_REPORT <span class="sc">|&gt;</span></span>
-<span id="cb11-276"><a href="#cb11-276" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(electricity_price_MWh, <span class="at">n =</span> <span class="dv">5</span>)</span>
-<span id="cb11-277"><a href="#cb11-277" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-278"><a href="#cb11-278" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(expensive_states,</span>
-<span id="cb11-279"><a href="#cb11-279" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(state, electricity_price_MWh),</span>
-<span id="cb11-280"><a href="#cb11-280" aria-hidden="true" tabindex="-1"></a>           <span class="at">y =</span> electricity_price_MWh)) <span class="sc">+</span></span>
-<span id="cb11-281"><a href="#cb11-281" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
-<span id="cb11-282"><a href="#cb11-282" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb11-283"><a href="#cb11-283" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> dollar) <span class="sc">+</span></span>
-<span id="cb11-284"><a href="#cb11-284" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb11-285"><a href="#cb11-285" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"States with the Most Expensive Electricity"</span>,</span>
-<span id="cb11-286"><a href="#cb11-286" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Average retail price per MWh"</span>,</span>
-<span id="cb11-287"><a href="#cb11-287" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="cn">NULL</span>,</span>
-<span id="cb11-288"><a href="#cb11-288" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Price ($ per MWh)"</span>,</span>
-<span id="cb11-289"><a href="#cb11-289" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Source: EIA State Electricity Profiles"</span></span>
-<span id="cb11-290"><a href="#cb11-290" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb11-291"><a href="#cb11-291" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>)</span>
-<span id="cb11-292"><a href="#cb11-292" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb11-293"><a href="#cb11-293" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-294"><a href="#cb11-294" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-295"><a href="#cb11-295" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-296"><a href="#cb11-296" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Which 5 states have the ‘dirtiest’ electricity mix? (Table)</span>
+<span id="cb11-263"><a href="#cb11-263" aria-hidden="true" tabindex="-1"></a><span class="fu">#### EDA EIA State Electricity Profiles</span></span>
+<span id="cb11-264"><a href="#cb11-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-267"><a href="#cb11-267" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-268"><a href="#cb11-268" aria-hidden="true" tabindex="-1"></a><span class="co"># Packages for formatted tables and number formatting</span></span>
+<span id="cb11-269"><a href="#cb11-269" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb11-270"><a href="#cb11-270" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb11-271"><a href="#cb11-271" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-272"><a href="#cb11-272" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Which 5 states have the most expensive retail electricity? </span>
+<span id="cb11-275"><a href="#cb11-275" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-276"><a href="#cb11-276" aria-hidden="true" tabindex="-1"></a><span class="co"># The 5 states with the highest average retail electricity price</span></span>
+<span id="cb11-277"><a href="#cb11-277" aria-hidden="true" tabindex="-1"></a>expensive_states <span class="ot">&lt;-</span> EIA_SEP_REPORT <span class="sc">|&gt;</span></span>
+<span id="cb11-278"><a href="#cb11-278" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(electricity_price_MWh, <span class="at">n =</span> <span class="dv">5</span>)</span>
+<span id="cb11-279"><a href="#cb11-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-280"><a href="#cb11-280" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(expensive_states,</span>
+<span id="cb11-281"><a href="#cb11-281" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(state, electricity_price_MWh),</span>
+<span id="cb11-282"><a href="#cb11-282" aria-hidden="true" tabindex="-1"></a>           <span class="at">y =</span> electricity_price_MWh)) <span class="sc">+</span></span>
+<span id="cb11-283"><a href="#cb11-283" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
+<span id="cb11-284"><a href="#cb11-284" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb11-285"><a href="#cb11-285" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> dollar) <span class="sc">+</span></span>
+<span id="cb11-286"><a href="#cb11-286" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb11-287"><a href="#cb11-287" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"States with the Most Expensive Electricity"</span>,</span>
+<span id="cb11-288"><a href="#cb11-288" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Average retail price per MWh"</span>,</span>
+<span id="cb11-289"><a href="#cb11-289" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb11-290"><a href="#cb11-290" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Price ($ per MWh)"</span>,</span>
+<span id="cb11-291"><a href="#cb11-291" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Source: EIA State Electricity Profiles"</span></span>
+<span id="cb11-292"><a href="#cb11-292" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-293"><a href="#cb11-293" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>)</span>
+<span id="cb11-294"><a href="#cb11-294" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-295"><a href="#cb11-295" aria-hidden="true" tabindex="-1"></a>We can see that <span class="in">`r expensive_states$state[1]`</span> is the state with the highest expensive Retail Electricity with <span class="in">`r dollar(expensive_states$electricity_price_MWh[1])`</span>, followed by California <span class="in">`r dollar(EIA_SEP_REPORT |&gt; filter(state == "California") |&gt; pull(electricity_price_MWh))`</span>, Conneticut, Rhode Island, and Massachusets with <span class="in">`r dollar(expensive_states$electricity_price_MWh[5])`</span>.</span>
+<span id="cb11-296"><a href="#cb11-296" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-297"><a href="#cb11-297" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-298"><a href="#cb11-298" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-299"><a href="#cb11-299" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>On average, how many pounds of CO2 are emitted per MWh of electricity produced in the US? (Note that you will need to use a suitably weighted average here.) (Inline answer)</span>
+<span id="cb11-298"><a href="#cb11-298" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Which 5 states have the ‘dirtiest’ electricity mix? (Table)</span>
+<span id="cb11-299"><a href="#cb11-299" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-300"><a href="#cb11-300" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-303"><a href="#cb11-303" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb11-304"><a href="#cb11-304" aria-hidden="true" tabindex="-1"></a><span class="co"># Weight each state's CO2 rate by how much electricity it generates,</span></span>
-<span id="cb11-305"><a href="#cb11-305" aria-hidden="true" tabindex="-1"></a><span class="co"># so big producers like Texas count more than small ones like Vermont</span></span>
-<span id="cb11-306"><a href="#cb11-306" aria-hidden="true" tabindex="-1"></a>us_avg_co2 <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(EIA_SEP_REPORT<span class="sc">$</span>CO2_MWh,</span>
-<span id="cb11-307"><a href="#cb11-307" aria-hidden="true" tabindex="-1"></a>                            EIA_SEP_REPORT<span class="sc">$</span>generation_MWh)</span>
-<span id="cb11-308"><a href="#cb11-308" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb11-309"><a href="#cb11-309" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-310"><a href="#cb11-310" aria-hidden="true" tabindex="-1"></a><span class="in">                            </span></span>
-<span id="cb11-311"><a href="#cb11-311" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>What are the three rarest primary energy sources in the US? What is the associated cost of electricity associated with each source and in what states are they used? (Table answer)</span>
-<span id="cb11-312"><a href="#cb11-312" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-313"><a href="#cb11-313" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>My home state, Texas, has a reputation as being the home of “dirty fossil fuels” while NY has a reputation as a leader in clean energy. How many times cleaner is NY’s energy mix than that of Texas? (Inline answer)</span>
-<span id="cb11-316"><a href="#cb11-316" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb11-317"><a href="#cb11-317" aria-hidden="true" tabindex="-1"></a><span class="co"># How many times more CO2 per MWh Texas emits compared with New York</span></span>
-<span id="cb11-318"><a href="#cb11-318" aria-hidden="true" tabindex="-1"></a>tx_co2 <span class="ot">&lt;-</span> EIA_SEP_REPORT <span class="sc">|&gt;</span> <span class="fu">filter</span>(abbreviation <span class="sc">==</span> <span class="st">"TX"</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(CO2_MWh)</span>
-<span id="cb11-319"><a href="#cb11-319" aria-hidden="true" tabindex="-1"></a>ny_co2 <span class="ot">&lt;-</span> EIA_SEP_REPORT <span class="sc">|&gt;</span> <span class="fu">filter</span>(abbreviation <span class="sc">==</span> <span class="st">"NY"</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(CO2_MWh)</span>
-<span id="cb11-320"><a href="#cb11-320" aria-hidden="true" tabindex="-1"></a>ny_cleaner <span class="ot">&lt;-</span> tx_co2 <span class="sc">/</span> ny_co2</span>
-<span id="cb11-321"><a href="#cb11-321" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb11-322"><a href="#cb11-322" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-323"><a href="#cb11-323" aria-hidden="true" tabindex="-1"></a>#TASK 3B</span>
-<span id="cb11-324"><a href="#cb11-324" aria-hidden="true" tabindex="-1"></a>#EDA - NTD Energy Usage</span>
-<span id="cb11-325"><a href="#cb11-325" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-326"><a href="#cb11-326" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Which five transit agencies used the most gallons of fuel (all sources) and how did it breakdown by type? (Table)</span>
+<span id="cb11-301"><a href="#cb11-301" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>On average, how many pounds of CO2 are emitted per MWh of electricity produced in the US? (Note that you will need to use a suitably weighted average here.) (Inline answer)</span>
+<span id="cb11-302"><a href="#cb11-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-305"><a href="#cb11-305" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-306"><a href="#cb11-306" aria-hidden="true" tabindex="-1"></a><span class="co"># Weight each state's CO2 rate by how much electricity it generates,</span></span>
+<span id="cb11-307"><a href="#cb11-307" aria-hidden="true" tabindex="-1"></a><span class="co"># so big producers like Texas count more than small ones like Vermont</span></span>
+<span id="cb11-308"><a href="#cb11-308" aria-hidden="true" tabindex="-1"></a>us_avg_co2 <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(EIA_SEP_REPORT<span class="sc">$</span>CO2_MWh,</span>
+<span id="cb11-309"><a href="#cb11-309" aria-hidden="true" tabindex="-1"></a>                            EIA_SEP_REPORT<span class="sc">$</span>generation_MWh)</span>
+<span id="cb11-310"><a href="#cb11-310" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-311"><a href="#cb11-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-312"><a href="#cb11-312" aria-hidden="true" tabindex="-1"></a><span class="in">                            </span></span>
+<span id="cb11-313"><a href="#cb11-313" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>What are the three rarest primary energy sources in the US? What is the associated cost of electricity associated with each source and in what states are they used? (Table answer)</span>
+<span id="cb11-314"><a href="#cb11-314" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-315"><a href="#cb11-315" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>My home state, Texas, has a reputation as being the home of “dirty fossil fuels” while NY has a reputation as a leader in clean energy. How many times cleaner is NY’s energy mix than that of Texas? (Inline answer)</span>
+<span id="cb11-318"><a href="#cb11-318" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb11-319"><a href="#cb11-319" aria-hidden="true" tabindex="-1"></a><span class="co"># How many times more CO2 per MWh Texas emits compared with New York</span></span>
+<span id="cb11-320"><a href="#cb11-320" aria-hidden="true" tabindex="-1"></a>tx_co2 <span class="ot">&lt;-</span> EIA_SEP_REPORT <span class="sc">|&gt;</span> <span class="fu">filter</span>(abbreviation <span class="sc">==</span> <span class="st">"TX"</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(CO2_MWh)</span>
+<span id="cb11-321"><a href="#cb11-321" aria-hidden="true" tabindex="-1"></a>ny_co2 <span class="ot">&lt;-</span> EIA_SEP_REPORT <span class="sc">|&gt;</span> <span class="fu">filter</span>(abbreviation <span class="sc">==</span> <span class="st">"NY"</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(CO2_MWh)</span>
+<span id="cb11-322"><a href="#cb11-322" aria-hidden="true" tabindex="-1"></a>ny_cleaner <span class="ot">&lt;-</span> tx_co2 <span class="sc">/</span> ny_co2</span>
+<span id="cb11-323"><a href="#cb11-323" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb11-324"><a href="#cb11-324" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-325"><a href="#cb11-325" aria-hidden="true" tabindex="-1"></a>#TASK 3B</span>
+<span id="cb11-326"><a href="#cb11-326" aria-hidden="true" tabindex="-1"></a>#EDA - NTD Energy Usage</span>
 <span id="cb11-327"><a href="#cb11-327" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-328"><a href="#cb11-328" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Across all US public transit, visualize the amounts of each type of fuel used (Graph)</span>
+<span id="cb11-328"><a href="#cb11-328" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Which five transit agencies used the most gallons of fuel (all sources) and how did it breakdown by type? (Table)</span>
 <span id="cb11-329"><a href="#cb11-329" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-330"><a href="#cb11-330" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>What is the least commonly used fuel source for US public transit? (Inline)</span>
+<span id="cb11-330"><a href="#cb11-330" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Across all US public transit, visualize the amounts of each type of fuel used (Graph)</span>
 <span id="cb11-331"><a href="#cb11-331" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-332"><a href="#cb11-332" aria-hidden="true" tabindex="-1"></a><span class="fu"># EDA - NTD Service </span></span>
+<span id="cb11-332"><a href="#cb11-332" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>What is the least commonly used fuel source for US public transit? (Inline)</span>
 <span id="cb11-333"><a href="#cb11-333" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-334"><a href="#cb11-334" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Which five transit services have the most UPT annually? (Graph)</span>
+<span id="cb11-334"><a href="#cb11-334" aria-hidden="true" tabindex="-1"></a><span class="fu"># EDA - NTD Service </span></span>
 <span id="cb11-335"><a href="#cb11-335" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-336"><a href="#cb11-336" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>What is the average trip length of a trip on MTA NYC? (Inline)</span>
+<span id="cb11-336"><a href="#cb11-336" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Which five transit services have the most UPT annually? (Graph)</span>
 <span id="cb11-337"><a href="#cb11-337" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-338"><a href="#cb11-338" aria-hidden="true" tabindex="-1"></a>3.CWhich transit service in NYC has the longest average trip length? (Inline)</span>
+<span id="cb11-338"><a href="#cb11-338" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>What is the average trip length of a trip on MTA NYC? (Inline)</span>
 <span id="cb11-339"><a href="#cb11-339" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-340"><a href="#cb11-340" aria-hidden="true" tabindex="-1"></a>Hint: You need to be careful with the City column here. Certain MTA services are officially located in “New York City” while others are located in Brooklyn.)</span>
+<span id="cb11-340"><a href="#cb11-340" aria-hidden="true" tabindex="-1"></a>3.CWhich transit service in NYC has the longest average trip length? (Inline)</span>
 <span id="cb11-341"><a href="#cb11-341" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-342"><a href="#cb11-342" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Which five states has the fewest total miles travelled by public transit? (Graph)</span>
+<span id="cb11-342"><a href="#cb11-342" aria-hidden="true" tabindex="-1"></a>Hint: You need to be careful with the City column here. Certain MTA services are officially located in “New York City” while others are located in Brooklyn.)</span>
 <span id="cb11-343"><a href="#cb11-343" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-344"><a href="#cb11-344" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Are all states represented in this data? If no, which ones are missing? The state.name and state.abb objects built into R may be useful here, as well as the anti_join() function.3 (Inline)</span>
+<span id="cb11-344"><a href="#cb11-344" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Which five states has the fewest total miles travelled by public transit? (Graph)</span>
 <span id="cb11-345"><a href="#cb11-345" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-346"><a href="#cb11-346" aria-hidden="true" tabindex="-1"></a>###Data Integration</span>
+<span id="cb11-346"><a href="#cb11-346" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Are all states represented in this data? If no, which ones are missing? The state.name and state.abb objects built into R may be useful here, as well as the anti_join() function.3 (Inline)</span>
 <span id="cb11-347"><a href="#cb11-347" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-348"><a href="#cb11-348" aria-hidden="true" tabindex="-1"></a>(select a join see example)</span>
+<span id="cb11-348"><a href="#cb11-348" aria-hidden="true" tabindex="-1"></a>###Data Integration</span>
 <span id="cb11-349"><a href="#cb11-349" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-350"><a href="#cb11-350" aria-hidden="true" tabindex="-1"></a>#task 4 Practice Joining Data Files</span>
+<span id="cb11-350"><a href="#cb11-350" aria-hidden="true" tabindex="-1"></a>(select a join see example)</span>
 <span id="cb11-351"><a href="#cb11-351" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-352"><a href="#cb11-352" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>How many UPTs were recorded in states where the primary energy source was nuclear power?</span>
+<span id="cb11-352"><a href="#cb11-352" aria-hidden="true" tabindex="-1"></a>#task 4 Practice Joining Data Files</span>
 <span id="cb11-353"><a href="#cb11-353" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-354"><a href="#cb11-354" aria-hidden="true" tabindex="-1"></a>2.In what metro area were the most gallons of bio-diesel used by public transit agencies?</span>
+<span id="cb11-354"><a href="#cb11-354" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>How many UPTs were recorded in states where the primary energy source was nuclear power?</span>
 <span id="cb11-355"><a href="#cb11-355" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-356"><a href="#cb11-356" aria-hidden="true" tabindex="-1"></a>NB: You are not required to actually include your answers to these questions in your submission. You will demonstrate knowledge of proper joining strategies in next section (Data Analysis) and your final deliverable. This is just a set of ‘warmups’ to help you orient yourself.</span>
+<span id="cb11-356"><a href="#cb11-356" aria-hidden="true" tabindex="-1"></a>2.In what metro area were the most gallons of bio-diesel used by public transit agencies?</span>
 <span id="cb11-357"><a href="#cb11-357" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-358"><a href="#cb11-358" aria-hidden="true" tabindex="-1"></a>#TASK 5</span>
-<span id="cb11-359"><a href="#cb11-359" aria-hidden="true" tabindex="-1"></a>####Data Analysis</span>
-<span id="cb11-360"><a href="#cb11-360" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Calculate Total Emissions</span></span>
-<span id="cb11-361"><a href="#cb11-361" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-362"><a href="#cb11-362" aria-hidden="true" tabindex="-1"></a>(Compute the total emissions associated with each Agency + Mode pair.)</span>
+<span id="cb11-358"><a href="#cb11-358" aria-hidden="true" tabindex="-1"></a>NB: You are not required to actually include your answers to these questions in your submission. You will demonstrate knowledge of proper joining strategies in next section (Data Analysis) and your final deliverable. This is just a set of ‘warmups’ to help you orient yourself.</span>
+<span id="cb11-359"><a href="#cb11-359" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-360"><a href="#cb11-360" aria-hidden="true" tabindex="-1"></a>#TASK 5</span>
+<span id="cb11-361"><a href="#cb11-361" aria-hidden="true" tabindex="-1"></a>####Data Analysis</span>
+<span id="cb11-362"><a href="#cb11-362" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Calculate Total Emissions</span></span>
 <span id="cb11-363"><a href="#cb11-363" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-364"><a href="#cb11-364" aria-hidden="true" tabindex="-1"></a>#TASK 6:</span>
-<span id="cb11-365"><a href="#cb11-365" aria-hidden="true" tabindex="-1"></a>####Normalize Emissions to Transit Usage</span>
-<span id="cb11-366"><a href="#cb11-366" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-367"><a href="#cb11-367" aria-hidden="true" tabindex="-1"></a>#TASK 7: Determine Award Winners</span>
+<span id="cb11-364"><a href="#cb11-364" aria-hidden="true" tabindex="-1"></a>(Compute the total emissions associated with each Agency + Mode pair.)</span>
+<span id="cb11-365"><a href="#cb11-365" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-366"><a href="#cb11-366" aria-hidden="true" tabindex="-1"></a>#TASK 6:</span>
+<span id="cb11-367"><a href="#cb11-367" aria-hidden="true" tabindex="-1"></a>####Normalize Emissions to Transit Usage</span>
 <span id="cb11-368"><a href="#cb11-368" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-369"><a href="#cb11-369" aria-hidden="true" tabindex="-1"></a>#Task 8:  Final Deliverable</span>
+<span id="cb11-369"><a href="#cb11-369" aria-hidden="true" tabindex="-1"></a>#TASK 7: Determine Award Winners</span>
 <span id="cb11-370"><a href="#cb11-370" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-371"><a href="#cb11-371" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-372"><a href="#cb11-372" aria-hidden="true" tabindex="-1"></a>#Extra Credit Opportunity #01: Relationship Diagram</span>
+<span id="cb11-371"><a href="#cb11-371" aria-hidden="true" tabindex="-1"></a>#Task 8:  Final Deliverable</span>
+<span id="cb11-372"><a href="#cb11-372" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-373"><a href="#cb11-373" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-374"><a href="#cb11-374" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-374"><a href="#cb11-374" aria-hidden="true" tabindex="-1"></a>#Extra Credit Opportunity #01: Relationship Diagram</span>
 <span id="cb11-375"><a href="#cb11-375" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-376"><a href="#cb11-376" aria-hidden="true" tabindex="-1"></a><span class="fu">### AI Usage Statement</span></span>
+<span id="cb11-376"><a href="#cb11-376" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-377"><a href="#cb11-377" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-378"><a href="#cb11-378" aria-hidden="true" tabindex="-1"></a>::: {.callout-note title="AI Usage Statement" collapse="true"}</span>
+<span id="cb11-378"><a href="#cb11-378" aria-hidden="true" tabindex="-1"></a><span class="fu">### AI Usage Statement</span></span>
 <span id="cb11-379"><a href="#cb11-379" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-380"><a href="#cb11-380" aria-hidden="true" tabindex="-1"></a>I used Claude by Anthropic and Gemini to help me understand concepts and tools in depth and complete the R code. They also helped to fix errors, provide improvement suggestions, and point out spelling mistakes throughout the project. The report was written by me.</span>
-<span id="cb11-381"><a href="#cb11-381" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb11-380"><a href="#cb11-380" aria-hidden="true" tabindex="-1"></a>::: {.callout-note title="AI Usage Statement" collapse="true"}</span>
+<span id="cb11-381"><a href="#cb11-381" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-382"><a href="#cb11-382" aria-hidden="true" tabindex="-1"></a>I used Claude by Anthropic and Gemini to help me understand concepts and tools in depth and complete the R code. They also helped to fix errors, provide improvement suggestions, and point out spelling mistakes throughout the project. The report was written by me.</span>
+<span id="cb11-383"><a href="#cb11-383" aria-hidden="true" tabindex="-1"></a>:::</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
