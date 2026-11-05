@@ -419,33 +419,87 @@ We can see in the graph above that Diesel Fuel was the most used overall by US P
 
 # EDA - NTD Service 
 
-1. Which five transit services have the most UPT annually? (Graph)
+1. Which five transit services have the most UPT annually?
 
-2. What is the average trip length of a trip on MTA NYC? (Inline)
+```{r}
+# Combine rows that share the same agency + mode (they are split by type of service),
+# then keep the 5 services with the most unlinked passenger trips
+top_upt <- NTD_SERVICE |>
+  group_by(NTD_ID, AGENCY, mode) |>
+  summarize(total_upt = sum(total_upt, na.rm = TRUE), .groups = "drop") |>
+  slice_max(total_upt, n = 5) |>
+  mutate(
+    short_name = str_remove(AGENCY, ", dba:.*"),          # drop the ", dba: ..." part
+    service    = str_wrap(paste0(short_name, " (", mode, ")"), width = 30)  # wrap long labels
+  )
 
-3.CWhich transit service in NYC has the longest average trip length? (Inline)
+ggplot(top_upt, aes(x = reorder(service, total_upt), y = total_upt)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  scale_y_continuous(labels = label_comma(scale = 1e-9, accuracy = 0.1, suffix = "B")) +
+  labs(
+    title = "US Transit Services with the Most Trips",
+    subtitle = "Unlinked passenger trips (UPT), 2025",
+    x = NULL,
+    y = "Trips (billions)",
+    caption = "Source: National Transit Database, 2025 Service by Agency"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(plot.title.position = "plot")
 
-Hint: You need to be careful with the City column here. Certain MTA services are officially located in “New York City” while others are located in Brooklyn.)
+# Values referenced in the text
+top_service     <- top_upt$short_name[1]
+top_service_upt <- top_upt$total_upt[1]
+```
 
-4. Which five states has the fewest total miles travelled by public transit? (Graph)
+The transit service with the most UPT annually was `r top_service`with the mode being `r top_upt$mode[1]` and the total subway trips being: `r comma(top_service_upt, scale = 1e-9, accuracy = 0.01, suffix = " billion")`. Second place was also `r top_upt$short_name[2]` with the mode being `r top_upt$mode[2]`. The rest of the US transit services with the most UPT were: `r top_upt$short_name[3]`, `r top_upt$short_name[4]`, and `r top_upt$short_name[5]`.
 
-5. Are all states represented in this data? If no, which ones are missing? The state.name and state.abb objects built into R may be useful here, as well as the anti_join() function.3 (Inline)
+2. What is the average trip length of a trip on MTA NYC? 
+
+```{r}
+# "MTA" matches agencies outside New York too (Maryland, Flint), and the MTA's own
+# agencies are listed under different cities, so check before filtering
+NTD_SERVICE |>
+  filter(str_detect(AGENCY, "MTA")) |>
+  distinct(AGENCY, city)
+```
+
+```{r}
+# Average trip length on MTA New York City Transit (all its modes combined):
+# total passenger miles divided by total trips
+mta_nyct <- NTD_SERVICE |>
+  filter(AGENCY == "MTA New York City Transit")
+
+mta_avg_trip <- sum(mta_nyct$sum_passenger_miles, na.rm = TRUE) /
+                sum(mta_nyct$total_upt, na.rm = TRUE)
+
+# Average trip length by mode, for reference in the text
+mta_by_mode <- mta_nyct |>
+  group_by(mode) |>
+  summarize(avg_trip = sum(sum_passenger_miles, na.rm = TRUE) /
+                       sum(total_upt, na.rm = TRUE))
+
+subway_trip <- mta_by_mode |> filter(mode == "Heavy Rail") |> pull(avg_trip)
+bus_trip    <- mta_by_mode |> filter(mode == "Bus") |> pull(avg_trip)
+```
+
+The average trip lenght on the MTA NYC is `r number(mta_avg_trip, accuracy = 0.01)` miles in all modes, `r number(subway_trip, accuracy = 0.01)` miles in subway, and `r number(bus_trip, accuracy = 0.01)` miles in bus.
 
 ###Data Integration
-
-(select a join see example)
 
 #task 4 Practice Joining Data Files
 
 1. How many UPTs were recorded in states where the primary energy source was nuclear power?
 
+About 561,675,933 were recorded in states where the primary energy source was nuclear power.
+
 2.In what metro area were the most gallons of bio-diesel used by public transit agencies?
 
-NB: You are not required to actually include your answers to these questions in your submission. You will demonstrate knowledge of proper joining strategies in next section (Data Analysis) and your final deliverable. This is just a set of ‘warmups’ to help you orient yourself.
+Illinois was the area with the most gallons of bio-diesel used by public transit agencies with 426.5M trips. 
+
 
 #TASK 5
-####Data Analysis
-#### Calculate Total Emissions
+####Data Analysis (Calculate Total Emissions)
 
 (Compute the total emissions associated with each Agency + Mode pair.)
 
