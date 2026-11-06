@@ -660,7 +660,7 @@ The most efficient agency with the per passenger mile, in the small category was
 
 The state whose agencies emit the most amount of CO2 per passenger mile is `r state.name[match(worst_state$state, state.abb)]` with `r number(worst_state$co2_per_mile, accuracy = 0.01)` pounds of CO2 per passenger mile and `r comma(worst_state$total_co2_lbs / 2000, accuracy = 1)` tons of CO2. To put this in perspective a solo driver in a car has `r number(car_co2_per_mile, accuracy = 0.01)` pounds of CO₂ per passenger mile, which means the state of `r state.name[match(worst_state$state, state.abb)]` agencies are `r number(worst_state$co2_per_mile / car_co2_per_mile, accuracy = 0.1)` times less efficient and green than driving a new car that meets the CAFE standard (`r CAFE_MPG`) mpg solo instead of using public transportation. For this award only states with 3 or more agencies were compared.
 
-## Final Deliverable: Press release
+## Press release
 
 ### `r overall_greenest[["Agency Name"]]` for the Win & `r state.name[match(worst_state$state, state.abb)]` for the Loss
 
