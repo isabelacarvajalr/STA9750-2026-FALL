@@ -19,11 +19,13 @@ execute:
 library(gt)
 library(scales)
 ```
-## Introduction: 
+## Introduction
 
 As the Executive Director of the Green Transit Alliance (GTA) I want to know how efficient was public transit in the United States during year 2025. I will be sharing my findings on this matter, and also award the most efficient agency and the least efficient state. 
 
-### Data Acquisition- State Electricity Profiles
+## Data Acquisition
+
+### State Electricity Profiles
 ```{r}
 library(tidyverse)
 library(stringr)
@@ -499,6 +501,8 @@ bus_trip    <- mta_by_mode |> filter(mode == "Bus") |> pull(avg_trip)
 
 The average trip length on the MTA NYC is `r number(mta_avg_trip, accuracy = 0.01)` miles in all modes, `r number(subway_trip, accuracy = 0.01)` miles in subway, and `r number(bus_trip, accuracy = 0.01)` miles in bus.
 
+## Data Analysis
+
 ### Calculating Total Emissions
 
 Here we combine the three tables NTD_SERVICE, NTD_ENERGY, and EIA_SEP_REPORT together to be able to get the CO2 associated with each agency and mode. 
@@ -621,6 +625,8 @@ The data was grouped by size and divided by trips, and miles to be able to evalu
 
 ## Award Winners (Transit Agencies)
 
+![](gta_awards_banner.jpg){width=100%}
+
 ```{r}
 # Reference values for the awards
 median_co2_per_mile <- median(agency_emissions$co2_per_mile)   # the typical agency
@@ -733,9 +739,9 @@ Best regards to the winners! And see you for the awards next year.
 - [NHTSA: Fuel Economy (CAFE) Standards for Model Years 2024–2026](https://www.nhtsa.gov/press-releases/usdot-announces-new-vehicle-fuel-economy-standards-model-year-2024-2026)
 
 
-### AI Usage Statement
+## AI Usage Statement
 
 ::: {.callout-note title="AI Usage Statement" collapse="true"}
 
-I used Claude by Anthropic and Gemini to help me understand concepts and tools in depth and complete the R code. They also helped to fix errors, provide improvement suggestions, and point out spelling mistakes throughout the project. The report was written by me.
+I used Claude by Anthropic and Gemini to help me understand concepts and tools in depth and complete the R code. They also helped to fix errors, provide improvement suggestions, and point out spelling mistakes throughout the project. Gemini was used to create the awards image. The report was written by me.
 :::
