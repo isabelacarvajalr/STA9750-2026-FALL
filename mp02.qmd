@@ -500,17 +500,6 @@ The average trip length on the MTA NYC is `r number(mta_avg_trip, accuracy = 0.0
 
 ### Data Integration
 
-# Joining Data Files
-
-1. How many UPTs were recorded in states where the primary energy source was nuclear power?
-
-About 561,675,933 were recorded in states where the primary energy source was nuclear power.
-
-2.In what metro area were the most gallons of bio-diesel used by public transit agencies?
-
-Illinois was the area with the most gallons of bio-diesel used by public transit agencies with 426.5M trips. 
-
-
 #### Data Analysis 
 
 ## Calculating Total Emissions
