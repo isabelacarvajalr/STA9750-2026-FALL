@@ -606,11 +606,54 @@ agency_emissions |>
   fmt_number(total_upt, decimals = 0) |>
   fmt_number(c(co2_per_trip, co2_per_mile), decimals = 3) |>
   tab_source_note(md("Sources: National Transit Database (2025); EIA State Electricity Profiles; EIA CO2 coefficients."))
+
+# Greenest agency in each size group, for the awards
+greenest <- agency_emissions |>
+  group_by(size) |>
+  slice_min(co2_per_mile, n = 1) |>
+  ungroup()
+# Greenest agency overall (lowest CO2 per passenger mile across all sizes)
+overall_greenest <- agency_emissions |> slice_min(co2_per_mile, n = 1)
 ```
 
+In the table above we can see the breakdown of the most efficient transit agencies by size after adding up each agency's modes (small-medium-large). We can also see the state they are in, the CO2 per trip, and the CO2 per mile. If the agency had 100k to 1 million trips it was categorized as small, if it had 1 million to 20 million trips it was categorized as medium, and if it had 20 million trips and above it was categorized large. The small agencies under 100k trips were not included in the analysis because the data is not reliable because it had wide variations and contained very few trips.
 
+The data was grouped by size and divided by trips, and miles to be able to evaluate the efficiency of the transit agencies regardless of the size. Measuring the emissions per mile shows the efficiency of each agency and prevents the large agencies from being incorrectly labeled the least green just because of the volume they have, but show the efficiency of agencies in other size ranges.
 
-#TASK 7: Determine Award Winners
+##Award Winners ( Greenest Transit Agencies)
+
+```{r}
+# Reference values for the awards
+median_co2_per_mile <- median(agency_emissions$co2_per_mile)   # the typical agency
+
+# A new car meeting the US fuel economy (CAFE) standard for model year 2026 gets about
+# 49 miles per gallon, so a solo driver emits the gasoline CO2 factor / 49 per mile
+CAFE_MPG         <- 49
+car_co2_per_mile <- CO2_GASOLINE / CAFE_MPG
+
+# "Worst of" award: the state whose public transit emits the most CO2
+# per passenger mile, with all of its agencies combined
+state_efficiency <- agency_emissions |>
+  group_by(state) |>
+  summarize(
+    total_co2_lbs   = sum(total_co2_lbs),
+    passenger_miles = sum(passenger_miles),
+    n_agencies      = n(),
+    .groups = "drop"
+  ) |>
+  mutate(co2_per_mile = total_co2_lbs / passenger_miles) |>
+  filter(n_agencies >= 3)          # skip states with too few agencies to judge fairly
+
+worst_state <- state_efficiency |> slice_max(co2_per_mile, n = 1)
+```
+
+Award 1:  Greenest Transit Agency Award (by size and overall): 
+
+The most efficient agency with the least CO2 per mile in the small category was `r greenest[["Agency Name"]][greenest$size == "Small"]` with `r number(greenest$co2_per_mile[greenest$size == "Small"], accuracy = 0.001)` pounds of CO₂ per passenger mile. The most efficient agency in the medium category was `r greenest[["Agency Name"]][greenest$size == "Medium"]` with `r number(greenest$co2_per_mile[greenest$size == "Medium"], accuracy = 0.001)` pounds of CO₂ per passenger mile. Finally, the most efficient agency in the large category was `r greenest[["Agency Name"]][greenest$size == "Large"]` with `r number(greenest$co2_per_mile[greenest$size == "Large"], accuracy = 0.001)` pounds of CO₂ per passenger mile. The greenest and most efficient transit agency overall was `r overall_greenest[["Agency Name"]]` with `r number(overall_greenest$co2_per_mile, accuracy = 0.001)` pounds of CO₂ per passenger mile. For reference here is the median for the agencies efficiency `r number(median_co2_per_mile, accuracy = 0.001)` pounds of CO₂ per passenger mile. This means the winner of this award is `r number(median_co2_per_mile / overall_greenest$co2_per_mile, accuracy = 0.1)` times greener than the median!
+
+Award 2: The Worst State whose public transit emits the most CO2 per passenger mile
+
+The state whose agencies emit the most amount of CO2 per passenger mile is `r state.name[match(worst_state$state, state.abb)]` with `r number(worst_state$co2_per_mile, accuracy = 0.01)` pounds of CO2 per passenger mile and `r comma(worst_state$total_co2_lbs / 2000, accuracy = 1)` tons of CO2. To put this in perspective a solo driver in a car has `r number(car_co2_per_mile, accuracy = 0.01)` pounds of CO₂ per passenger mile, which means the state of `r state.name[match(worst_state$state, state.abb)]` agencies are `r number(worst_state$co2_per_mile / car_co2_per_mile, accuracy = 0.1)` times less efficient and green than driving a new car that meets the CAFE standard (`r CAFE_MPG`) mpg solo instead of using public transportation. For this award only states with 3 or more agencies were compared.
 
 #Task 8:  Final Deliverable
 
