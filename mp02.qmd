@@ -344,10 +344,10 @@ ny_co2 <- EIA_SEP_REPORT |> filter(abbreviation == "NY") |> pull(CO2_MWh)
 ny_cleaner <- tx_co2 / ny_co2
 ```
 
-NY's energy mix is `r comma(ny_co2)` pounds of CO₂ per MWh, Texas energy mix is `r comma(tx_co2)` pounds of CO₂ per MWh, and NY's energy mix is `r number(ny_cleaner, accuracy = 0.01)` pounds of CO₂ per MWh times cleaner than the energy mix in Texas.
+NY's energy mix is `r comma(ny_co2)` pounds of CO₂ per MWh, Texas energy mix is `r comma(tx_co2)` pounds of CO₂ per MWh, and NY's energy mix is `r number(ny_cleaner, accuracy = 0.01)` times cleaner than the energy mix in Texas.
 
 
-#EDA - NTD Energy Usage
+### EDA - NTD Energy Usage
 
 1. Which five transit agencies used the most gallons of fuel (all sources) and how did it breakdown by type?
 
@@ -430,7 +430,7 @@ biodiesel_share   <- biodiesel_gallons / sum(fuel_totals$gallons)
 ```
 We can see in the graph above that Diesel Fuel was the most used overall by US Public Transit with `r comma(diesel_gallons, scale = 1e-6, accuracy = 1, suffix = " million")` gallons. The second most used was Compressed Natural Gas with `r comma(cng_gallons, scale = 1e-6, accuracy = 1, suffix = " million")` gallons, and the third was Gasoline with `r comma(gas_gallons, scale = 1e-6, accuracy = 1, suffix = " million")` gallons. Overall, diesel had `r percent(diesel_share, accuracy = 0.1)` share of the amount of gallons used which is more than half of the gallon based energy. Compressed natural gas had a `r percent(cng_share, accuracy = 0.1)` share of the amount of gallons, and the rest of the shares are divided into the remaining of the gallon-based energies in smaller shares. 
 
-# EDA - NTD Service 
+### EDA - NTD Service
 
 1. Which five transit services have the most UPT annually?
 
@@ -498,9 +498,8 @@ bus_trip    <- mta_by_mode |> filter(mode == "Bus") |> pull(avg_trip)
 
 The average trip length on the MTA NYC is `r number(mta_avg_trip, accuracy = 0.01)` miles in all modes, `r number(subway_trip, accuracy = 0.01)` miles in subway, and `r number(bus_trip, accuracy = 0.01)` miles in bus.
 
-### Data Integration
 
-#### Data Analysis 
+## Data Analysis 
 
 ## Calculating Total Emissions
 
@@ -622,7 +621,7 @@ In the table above we can see the breakdown of the most efficient transit agenci
 
 The data was grouped by size and divided by trips, and miles to be able to evaluate the efficiency of the transit agencies regardless of the size. Measuring the emissions per mile shows the efficiency of each agency and prevents the large agencies from being incorrectly labeled the least green just because of the volume they have, but show the efficiency of agencies in other size ranges.
 
-## Award Winners ( Greenest Transit Agencies)
+## Award Winners (Transit Agencies)
 
 ```{r}
 # Reference values for the awards
@@ -657,7 +656,13 @@ Award 2: The Worst State whose public transit emits the most CO2 per passenger m
 
 The state whose agencies emit the most amount of CO2 per passenger mile is `r state.name[match(worst_state$state, state.abb)]` with `r number(worst_state$co2_per_mile, accuracy = 0.01)` pounds of CO2 per passenger mile and `r comma(worst_state$total_co2_lbs / 2000, accuracy = 1)` tons of CO2. To put this in perspective a solo driver in a car has `r number(car_co2_per_mile, accuracy = 0.01)` pounds of CO₂ per passenger mile, which means the state of `r state.name[match(worst_state$state, state.abb)]` agencies are `r number(worst_state$co2_per_mile / car_co2_per_mile, accuracy = 0.1)` times less efficient and green than driving a new car that meets the CAFE standard (`r CAFE_MPG`) mpg solo instead of using public transportation. For this award only states with 3 or more agencies were compared.
 
-#Task 8:  Final Deliverable
+## Final Deliverable
+
+### `r overall_greenest[["Agency Name"]]` for the Win & `r state.name[match(worst_state$state, state.abb)]` for the lose
+
+The Green Transit Alliance is awarding the winners for the most efficient transit agencies and the least efficient state. In the plots below you can see the breakdown of the greenest transit agencies of 2025, the winner was `r overall_greenest[["Agency Name"]]` with `r number(overall_greenest$co2_per_mile, accuracy = 0.001)` pounds of CO₂ per passenger mile, this in comparison to `r number(median_co2_per_mile / overall_greenest$co2_per_mile, accuracy = 0.1)`  (Times greener than the median). 
+
+On the other hand, the state where the public transit was least efficient during 2025 was `r state.name[match(worst_state$state, state.abb)]` with `r number(worst_state$co2_per_mile, accuracy = 0.01)` pounds of CO₂ per passenger mile (`r number(worst_state$co2_per_mile / car_co2_per_mile, accuracy = 0.1)` Times worse than a solo driver in a new car)
 
 ```{r}
 # Winners in each size group, next to two reference points
@@ -715,7 +720,7 @@ ggplot(worst_states_plot,
 ```
 
 
-#Extra Credit Opportunity #01: Relationship Diagram
+# Extra Credit Opportunity #01: Relationship Diagram
 
 
 
