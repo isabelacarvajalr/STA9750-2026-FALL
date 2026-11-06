@@ -13,6 +13,12 @@ execute:
   warning: false
   message: false
 ---
+
+```{r}
+# Packages for formatted tables and number formatting
+library(gt)
+library(scales)
+```
 ## Introduction: 
 
 
@@ -246,6 +252,18 @@ recode_mode <- function(x) {
 # Apply the same translation to both NTD tables so they still match when joined
 NTD_ENERGY  <- NTD_ENERGY  |> mutate(Mode = recode_mode(Mode))
 NTD_SERVICE <- NTD_SERVICE |> mutate(mode = recode_mode(mode))
+
+# Result of the recode: every mode now has a readable name (no "Unknown"),
+# with how many agency-mode rows use each one
+NTD_ENERGY |>
+  count(Mode, sort = TRUE) |>
+  gt() |>
+  tab_header(
+    title = "Transit Modes After Recoding",
+    subtitle = "Number of agency-mode rows in the NTD energy data"
+  ) |>
+  cols_label(Mode = "Mode", n = "Agency-Mode Rows") |>
+  tab_source_note(md("Source: National Transit Database, 2025 Energy Consumption."))
 ```
 ## Exploratory Data analysis
 
@@ -254,11 +272,6 @@ The problem was the data had 2 letter codes and there are `r n_distinct(NTD_ENER
 
 #### EDA EIA State Electricity Profiles
 
-```{r}
-# Packages for formatted tables and number formatting
-library(gt)
-library(scales)
-```
 1. Which 5 states have the most expensive retail electricity? 
 ```{r}
 # The 5 states with the highest average retail electricity price
@@ -620,7 +633,7 @@ In the table above we can see the breakdown of the most efficient transit agenci
 
 The data was grouped by size and divided by trips, and miles to be able to evaluate the efficiency of the transit agencies regardless of the size. Measuring the emissions per mile shows the efficiency of each agency and prevents the large agencies from being incorrectly labeled the least green just because of the volume they have, but show the efficiency of agencies in other size ranges.
 
-##Award Winners ( Greenest Transit Agencies)
+## Award Winners ( Greenest Transit Agencies)
 
 ```{r}
 # Reference values for the awards
