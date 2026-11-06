@@ -21,6 +21,7 @@ library(scales)
 ```
 ## Introduction: 
 
+As the Executive Director of the Green Transit Alliance (GTA) I want to know how efficient was public transit in the United States during year 2025. I will be sharing my findings on this matter, and also award the most efficient agency and the least efficient state. 
 
 ### Data Acquisition- State Electricity Profiles
 ```{r}
@@ -103,7 +104,7 @@ get_eia_sep <- function(state, abbr){
 EIA_SEP_REPORT <- map2(state.name, state.abb, get_eia_sep) |> list_rbind()
 ```
 
-#### Energy Consumption (NTD Energy Usage)
+### Energy Consumption (NTD Energy Usage)
 ```{r}
 load_ntd_energy <- function(){
   library(readxl)
@@ -162,7 +163,7 @@ load_ntd_energy <- function(){
 NTD_ENERGY <- load_ntd_energy()
 ```
 
-#### Transit Service Provided
+### Transit Service Provided
 
 ```{r}
 load_ntd_service <- function(){
@@ -270,7 +271,7 @@ NTD_ENERGY |>
 The problem was the data had 2 letter codes and there are `r n_distinct(NTD_ENERGY$Mode)` different ones. For anyone that is not familiar with what each means its hard to understand so I renamed the. I found them with distinct(), then built one function and used it so the two tables NTD_Energy and NTD_Service can be matched on mode later since the labels on both have to be identical. The most agency mode rows in the data set was Bus and Demand response.
 
 
-#### EDA EIA State Electricity Profiles
+### EDA EIA State Electricity Profiles
 
 1. Which 5 states have the most expensive retail electricity? 
 ```{r}
@@ -293,7 +294,7 @@ ggplot(expensive_states,
   ) +
   theme_minimal(base_size = 14)
 ```
-We can see that `r expensive_states$state[1]` is the state with the highest expensive Retail Electricity with `r dollar(expensive_states$electricity_price_MWh[1])`, followed by `r expensive_states$state[2]` with `r dollar(EIA_SEP_REPORT |> filter(state == "California") |> pull(electricity_price_MWh))`, `r expensive_states$state[3]`, `r expensive_states$state[4]`, and `r expensive_states$state[5]` with `r dollar(expensive_states$electricity_price_MWh[5])`.
+We can see that `r expensive_states$state[1]` is the state with the highest expensive Retail Electricity with `r dollar(expensive_states$electricity_price_MWh[1])`, followed by `r expensive_states$state[2]` with `r dollar(expensive_states$electricity_price_MWh[2])`, `r expensive_states$state[3]`, `r expensive_states$state[4]`, and `r expensive_states$state[5]` with `r dollar(expensive_states$electricity_price_MWh[5])`.
 
 
 2. Which 5 states have the ‘dirtiest’ electricity mix? 
@@ -321,7 +322,7 @@ dirtiest_states |>
   tab_source_note(md("Source: EIA State Electricity Profiles."))
 ```
 
-Here we can see the 5 states have the ‘dirtiest’ electricity mix are West Virginia with `r comma(dirtiest_states$CO2_MWh[1])`, Kentucky with `r comma(dirtiest_states$CO2_MWh[2])`, Wyoming with `r comma(dirtiest_states$CO2_MWh[3])`, Missouri with `r comma(dirtiest_states$CO2_MWh[4])`, and Hawaii with `r comma(dirtiest_states$CO2_MWh[5])`.
+Here we can see the 5 states have the ‘dirtiest’ electricity mix are West Virginia with `r comma(dirtiest_states$CO2_MWh[1])` pounds of CO₂ per MWh, Kentucky with `r comma(dirtiest_states$CO2_MWh[2])` pounds of CO₂ per MWh, Wyoming with `r comma(dirtiest_states$CO2_MWh[3])` pounds of CO₂ per MWh, Missouri with `r comma(dirtiest_states$CO2_MWh[4])` pounds of CO₂ per MWh, and Hawaii with `r comma(dirtiest_states$CO2_MWh[5])` pounds of CO₂ per MWh.
 
 3. On average, how many pounds of CO2 are emitted per MWh of electricity produced in the US? 
 
@@ -465,7 +466,7 @@ top_service     <- top_upt$short_name[1]
 top_service_upt <- top_upt$total_upt[1]
 ```
 
-The transit service with the most UPT annually was `r top_service`with the mode being `r top_upt$mode[1]` and the total subway trips being: `r comma(top_service_upt, scale = 1e-9, accuracy = 0.01, suffix = " billion")`. Second place was also `r top_upt$short_name[2]` with the mode being `r top_upt$mode[2]`. The rest of the US transit services with the most UPT were: `r top_upt$short_name[3]`, `r top_upt$short_name[4]`, and `r top_upt$short_name[5]`.
+The transit service with the most UPT annually was `r top_service` with the mode being `r top_upt$mode[1]` and the total subway trips being: `r comma(top_service_upt, scale = 1e-9, accuracy = 0.01, suffix = " billion")`. Second place was also `r top_upt$short_name[2]` with the mode being `r top_upt$mode[2]`. The rest of the US transit services with the most UPT were: `r top_upt$short_name[3]`, `r top_upt$short_name[4]`, and `r top_upt$short_name[5]`.
 
 2. What is the average trip length of a trip on MTA NYC? 
 
@@ -498,10 +499,7 @@ bus_trip    <- mta_by_mode |> filter(mode == "Bus") |> pull(avg_trip)
 
 The average trip length on the MTA NYC is `r number(mta_avg_trip, accuracy = 0.01)` miles in all modes, `r number(subway_trip, accuracy = 0.01)` miles in subway, and `r number(bus_trip, accuracy = 0.01)` miles in bus.
 
-
-## Data Analysis 
-
-## Calculating Total Emissions
+### Calculating Total Emissions
 
 Here we combine the three tables NTD_SERVICE, NTD_ENERGY, and EIA_SEP_REPORT together to be able to get the CO2 associated with each agency and mode. 
 
@@ -559,7 +557,7 @@ I used inner_join to merge NTD_ENERGY with service_by_mode and then I merged tha
 
 Then the Electricity Emissions was computed by converting kWh to MWh (1MWh=1,000kWh) and then multiplying the MWh from NTD_ENERGY by the states CO2 per MWh that could be found in the EIA_SEP_REPORT. The fuel and electricity emissions are added for the total.
 
-#### Normalize Emissions to Transit Usage (Emissions per trip and per mile)
+### Normalize Emissions to Transit Usage (Emissions per trip and per mile)
 
 ```{r}
 # Combine each agency's modes, then compute emissions per trip and per passenger mile.
@@ -648,21 +646,21 @@ state_efficiency <- agency_emissions |>
 worst_state <- state_efficiency |> slice_max(co2_per_mile, n = 1)
 ```
 
-##### Award 1:  Greenest Transit Agency Award (by size and overall): 
+### Award 1:  Greenest Transit Agency Award (by size and overall): 
 
-The most efficient agency with the least CO2 per mile in the small category was `r greenest[["Agency Name"]][greenest$size == "Small"]` with `r number(greenest$co2_per_mile[greenest$size == "Small"], accuracy = 0.001)` pounds of CO₂ per passenger mile. The most efficient agency in the medium category was `r greenest[["Agency Name"]][greenest$size == "Medium"]` with `r number(greenest$co2_per_mile[greenest$size == "Medium"], accuracy = 0.001)` pounds of CO₂ per passenger mile. Finally, the most efficient agency in the large category was `r greenest[["Agency Name"]][greenest$size == "Large"]` with `r number(greenest$co2_per_mile[greenest$size == "Large"], accuracy = 0.001)` pounds of CO₂ per passenger mile. The greenest and most efficient transit agency overall was `r overall_greenest[["Agency Name"]]` with `r number(overall_greenest$co2_per_mile, accuracy = 0.001)` pounds of CO₂ per passenger mile. For reference here is the median for the agencies efficiency `r number(median_co2_per_mile, accuracy = 0.001)` pounds of CO₂ per passenger mile. This means the winner of this award is `r number(median_co2_per_mile / overall_greenest$co2_per_mile, accuracy = 0.1)` times greener than the median!
+The most efficient agency with the per passenger mile, in the small category was `r greenest[["Agency Name"]][greenest$size == "Small"]` with `r number(greenest$co2_per_mile[greenest$size == "Small"], accuracy = 0.001)` pounds of CO₂ per passenger mile. The most efficient agency in the medium category was `r greenest[["Agency Name"]][greenest$size == "Medium"]` with `r number(greenest$co2_per_mile[greenest$size == "Medium"], accuracy = 0.001)` pounds of CO₂ per passenger mile. Finally, the most efficient agency in the large category was `r greenest[["Agency Name"]][greenest$size == "Large"]` with `r number(greenest$co2_per_mile[greenest$size == "Large"], accuracy = 0.001)` pounds of CO₂ per passenger mile. The greenest and most efficient transit agency overall was `r overall_greenest[["Agency Name"]]` with `r number(overall_greenest$co2_per_mile, accuracy = 0.001)` pounds of CO₂ per passenger mile. For reference here is the median for the agencies efficiency `r number(median_co2_per_mile, accuracy = 0.001)` pounds of CO₂ per passenger mile. This means the winner of this award is `r number(median_co2_per_mile / overall_greenest$co2_per_mile, accuracy = 0.1)` times greener than the median!
 
-#####Award 2: The Worst State whose public transit emits the most CO2 per passenger mile
+### Award 2: The Worst State whose public transit emits the most CO2 per passenger mile
 
 The state whose agencies emit the most amount of CO2 per passenger mile is `r state.name[match(worst_state$state, state.abb)]` with `r number(worst_state$co2_per_mile, accuracy = 0.01)` pounds of CO2 per passenger mile and `r comma(worst_state$total_co2_lbs / 2000, accuracy = 1)` tons of CO2. To put this in perspective a solo driver in a car has `r number(car_co2_per_mile, accuracy = 0.01)` pounds of CO₂ per passenger mile, which means the state of `r state.name[match(worst_state$state, state.abb)]` agencies are `r number(worst_state$co2_per_mile / car_co2_per_mile, accuracy = 0.1)` times less efficient and green than driving a new car that meets the CAFE standard (`r CAFE_MPG`) mpg solo instead of using public transportation. For this award only states with 3 or more agencies were compared.
 
 ## Final Deliverable: Press release
 
-### `r overall_greenest[["Agency Name"]]` for the Win & `r state.name[match(worst_state$state, state.abb)]` for the lose
+### `r overall_greenest[["Agency Name"]]` for the Win & `r state.name[match(worst_state$state, state.abb)]` for the Loss
 
 The Green Transit Alliance is awarding the winners for the most efficient transit agencies and the least efficient state. In the plots below you can see the breakdown of the greenest transit agencies of 2025, the winner was `r overall_greenest[["Agency Name"]]` with `r number(overall_greenest$co2_per_mile, accuracy = 0.001)` pounds of CO₂ per passenger mile, this in comparison to `r number(median_co2_per_mile / overall_greenest$co2_per_mile, accuracy = 0.1)`  (Times greener than the median). 
 
-On the other hand, the state where the public transit was least efficient during 2025 was `r state.name[match(worst_state$state, state.abb)]` with `r number(worst_state$co2_per_mile, accuracy = 0.01)` pounds of CO₂ per passenger mile (`r number(worst_state$co2_per_mile / car_co2_per_mile, accuracy = 0.1)` Times worse than a solo driver in a new car).
+On the other hand, the state where the public transit was least efficient during 2025 was `r state.name[match(worst_state$state, state.abb)]` with `r number(worst_state$co2_per_mile, accuracy = 0.01)` pounds of CO₂ per passenger mile. In comparison this is `r number(worst_state$co2_per_mile / car_co2_per_mile, accuracy = 0.1)` times worse than a solo driver in a new car).
 
 On the plot below a visual comparison was added so the pounds of CO2 per passenger mile were put into perspective. `r overall_greenest[["Agency Name"]]` has an impressive efficiency and it can be seen when comparing it side by side with a large and small size agencies, driving solo on a new car, and the median US transit Agency. 
 
@@ -699,7 +697,7 @@ ggplot(award1_plot_data,
   theme(plot.title.position = "plot", legend.position = "top")
 ```
 
-On the plot below we can visially see where the public transit was the least efficient in worst to least worst. `r state.name[match(worst_state$state, state.abb)]` takes the win here because it is the least efficient state, causing the most pollution. This is a sign for them to start making changes and become greener.
+On the plot below we can visially see where the public transit was the least efficient in worst to least worst. `r state.name[match(worst_state$state, state.abb)]` takes the win here because it is the least efficient state, causing the most CO₂ per passenger mile. This is a sign for them to start making changes and become greener.
 ```{r}
 # The 10 least efficient states, with the worst one highlighted
 worst_states_plot <- state_efficiency |>
@@ -723,6 +721,8 @@ ggplot(worst_states_plot,
   theme_minimal(base_size = 14) +
   theme(plot.title.position = "plot")
 ```
+
+Best regards to the winners! And see you for the awards next year.
 
 **Data sources:**
 
