@@ -1,6 +1,615 @@
 ---
-title: "Mini-Project Placeholder"
+title: "Mini-Project #03: Where My People At?"
+format:
+  html:
+    code-fold: true
+    toc: true
+execute:
+  warning: false
+  message: false
 ---
 
-This is a placeholder for STA9750 Mini-Project 3. Check back soon for more!
+## Introduction
 
+```{r}
+library(tidyverse)
+library(tidycensus)
+library(sf)
+library(httr2)
+library(gt)
+library(ggiraph)
+library(patchwork)
+
+if (!dir.exists(file.path("data", "mp03"))) {
+  dir.create(file.path("data", "mp03"), recursive = TRUE)
+}
+  col_yellow <- "#FCD116"
+col_blue   <- "#003893"
+col_red    <- "#CE1126"
+```
+## Data Acquisition
+
+### Metro Areas (CBSA)
+
+CBSA stands for Core Based Statistical Area, and it is the census name for an area and the surroundings where people live and commute from every day. In this case we will be using New York area and the surroundings where people live.
+
+```{r}
+cbsa_file <- file.path("data", "mp03", "cbsa_colombian.shp")
+
+if (!file.exists(cbsa_file)) {
+  cbsa_raw <- get_acs(
+    geography = "cbsa",
+    variables = c(total = "B01003_001", colombian = "B03001_020"),
+    year = 2024,
+    survey = "acs5",
+    output = "wide",
+    geometry = TRUE
+  )
+  write_sf(cbsa_raw, cbsa_file)
+}
+
+cbsa <- read_sf(cbsa_file)
+```
+
+### NYC Census Tracts
+
+```{r}
+tract_file <- file.path("data", "mp03", "nyc_tracts_colombian.shp")
+
+if (!file.exists(tract_file)) {
+  tracts_raw <- get_acs(
+    geography = "tract",
+    variables = c(total = "B01003_001", colombian = "B03001_020"),
+    state = "NY",
+    county = c("New York", "Kings", "Queens", "Bronx", "Richmond"),
+    year = 2024,
+    survey = "acs5",
+    output = "wide",
+    geometry = TRUE
+  )
+  write_sf(tracts_raw, tract_file)
+}
+
+nyc_tracts <- read_sf(tract_file)
+```
+
+```{r}
+load_nyc_nta <- function() {
+  data_dir <- file.path("data", "mp03")
+  if (!dir.exists(data_dir)) dir.create(data_dir, recursive = TRUE)
+
+  nta_url <- "https://s-media.nyc.gov/agencies/dcp/assets/files/zip/data-tools/bytes/neighborhood-tabulation-areas/nynta2020_26d.zip"
+  zip_file <- file.path(data_dir, "nyc_nta.zip")
+  if (!file.exists(zip_file)) {
+    download.file(nta_url, destfile = zip_file, mode = "wb")
+  }
+
+  unzip_dir <- file.path(data_dir, "nyc_nta")
+  if (!dir.exists(unzip_dir)) unzip(zip_file, exdir = unzip_dir)
+
+  shp_path <- list.files(unzip_dir, pattern = "\\.shp$",
+                         recursive = TRUE, full.names = TRUE)
+
+  read_sf(shp_path[1]) |>
+    select(BoroName, NTA2020, NTAName, NTAType)
+}
+
+nyc_nta <- load_nyc_nta()
+nyc_nta
+```
+
+### Aggregating Tracts to Neighborhoods
+Census tracts and NTAs are drawn by different agencies, so because some tracts may fall in two neighborhoods we assigned each tract to the neighborhood it overlaps the most instead of splitting them, and then added up the population count for each neighborhood. This makes it easier to have the actual neighborhood name instead of an ID tract and give us a better sense of the data. 
+
+```{r}
+# 1. Put tracts in the same CRS as the NTA map, drop empty (water) tracts
+nyc_tracts <- nyc_tracts |>
+  filter(!st_is_empty(geometry)) |>
+  st_transform(st_crs(nyc_nta))
+
+# 2. Spatial join: each tract gets the NTA it overlaps most
+tract_nta <- st_join(nyc_tracts, nyc_nta,
+                     join = st_intersects, largest = TRUE)
+
+# 3. Drop geometry and add up tracts within each NTA
+nta_pop <- tract_nta |>
+  st_drop_geometry() |>
+  group_by(NTA2020) |>
+  summarize(total = sum(totalE, na.rm = TRUE),
+            colombian = sum(colombianE, na.rm = TRUE)) |>
+  mutate(pct_colombian = colombian / total)
+
+# 4. Reconnect to the NTA shapes
+nyc_nta_pop <- nyc_nta |>
+  left_join(nta_pop, by = "NTA2020")
+
+nyc_nta_pop |> arrange(desc(colombian))
+```
+
+### NYC Buildings (PLUTO)
+
+```{r}
+pluto_file <- file.path("data", "mp03", "pluto.csv")
+
+if (!file.exists(pluto_file)) {
+  base_url <- "https://data.cityofnewyork.us/resource/64uk-42ks.csv"
+  page_size <- 50000
+  offset <- 0
+  pages <- list()
+
+  repeat {
+    resp <- request(base_url) |>
+      req_url_query(
+        `$select` = "bbl,borough,bct2020,landuse,unitsres,unitstotal,resarea,officearea,comarea,bldgarea,numfloors",
+        `$order`  = "bbl",
+        `$limit`  = page_size,
+        `$offset` = offset
+      ) |>
+      req_perform()
+
+    page <- read_csv(I(resp_body_string(resp)),
+                     col_types = cols(.default = "c"))
+    pages[[length(pages) + 1]] <- page
+    message("Downloaded rows ", offset + 1, " to ", offset + nrow(page))
+
+    if (nrow(page) < page_size) break
+    offset <- offset + page_size
+  }
+
+  bind_rows(pages) |> write_csv(pluto_file)
+}
+
+pluto <- read_csv(pluto_file, col_types = cols(bct2020 = "c", bbl = "c"))
+```
+
+## Data Integration
+Now we have to join the buildings to population by census tract. As of right now PLUTO's ID is the borough digit + the tract, and the Census ID is NY + County+ the tract. The purpose of this join is so PLUTO is added by tract and match the ID's we will be using later. 
+
+```{r}
+# Borough digit -> county FIPS
+boro_fips <- c("1" = "061", "2" = "005", "3" = "047",
+               "4" = "081", "5" = "085")
+
+pluto_tract <- pluto |>
+  filter(!is.na(bct2020)) |>
+  mutate(
+    GEOID = paste0("36", unname(boro_fips[str_sub(bct2020, 1, 1)]),
+                   str_sub(bct2020, 2, 7)),
+    across(c(officearea, unitsres, resarea, comarea, bldgarea),
+           ~ replace_na(.x, 0))
+  ) |>
+  group_by(GEOID) |>
+  summarize(
+    office_area = sum(officearea),
+    res_units   = sum(unitsres),
+    res_area    = sum(resarea),
+    com_area    = sum(comarea),
+    bldg_area   = sum(bldgarea),
+        max_floors  = if (all(is.na(numfloors))) NA_real_ else max(numfloors, na.rm = TRUE),
+    avg_floors  = mean(numfloors, na.rm = TRUE)
+  )
+
+# Join to census tracts (keeps NTA info from Step 5)
+tracts_full <- tract_nta |>
+  left_join(pluto_tract, by = "GEOID")
+```
+
+## Exploratory Data Analysis
+
+### NYC's Built Environment
+
+#### Where is NYC's office space?
+(Which NYC census tract has the most office floor area in NYC?)
+
+Office space matters for understanding where people live, because office areas have less population density, they have a lot of office buildings and commercial areas, but not as many resident buildings. People have to commute to go to work when they don't live in the area. 
+
+(A census tract is a small area the Census Bureau uses to collect data, and each tract has an ID.)
+
+```{r}
+top_office <- tracts_full |>
+  st_drop_geometry() |>
+  slice_max(office_area, n = 5) |>
+  select(GEOID, NTAName, BoroName, office_area)
+
+top_office |>
+  gt() |>
+  tab_header(
+    title = "NYC Census Tracts with the Most Office Space",
+    subtitle = "Total office floor area, square feet"
+  ) |>
+  cols_label(
+    GEOID = "Tract ID",
+    NTAName = "Neighborhood",
+    BoroName = "Borough",
+    office_area = "Office Area (sq ft)"
+  ) |>
+  fmt_number(office_area, decimals = 0) |>
+    data_color(columns = office_area, palette = "Blues") |>
+  tab_source_note("Source: NYC PLUTO")
+```
+
+In the table above we can see the top 5 NYC Census Tracts with the most office space. The top tract, in `r top_office$NTAName[1]`, has
+`r scales::comma(top_office$office_area[1])` square feet of office space. In this top 5 we can see `r knitr::combine_words(unique(top_office$BoroName))` is the borough for all the top tracts. We can also see these 2 areas `r knitr::combine_words(unique(top_office$NTAName))` have the most concentration of office space.
+
+#### Where are NYC's homes?
+(Which NTA has the most residential units?)
+
+```{r}
+nta_units <- tracts_full |>
+  st_drop_geometry() |>
+  group_by(NTA2020, NTAName, BoroName) |>
+  summarize(res_units = sum(res_units, na.rm = TRUE), .groups = "drop") |>
+  slice_max(res_units, n = 10)
+
+p_units <- ggplot(nta_units,
+       aes(x = res_units,
+           y = fct_reorder(NTAName, res_units),
+           fill = BoroName,
+           tooltip = paste0(NTAName, " (", BoroName, ")\n",
+                            scales::comma(res_units), " units"),
+           data_id = NTA2020)) +
+  geom_col_interactive() +
+  scale_x_continuous(labels = scales::comma) +
+  labs(
+    title = "NYC Neighborhoods with the Most Residential Units",
+    subtitle = "Top 10 Neighborhood Tabulation Areas · hover for details",
+    x = "Residential units", y = NULL, fill = "Borough",
+    caption = "Source: NYC PLUTO; NYC Dept. of City Planning NTAs"
+  ) +
+    theme_minimal() +
+  theme(plot.title.position = "plot")
+
+girafe(ggobj = p_units, width_svg = 9, height_svg = 5,
+       options = list(opts_sizing(rescale = TRUE)))
+```
+The chart above gives us a visual on the top 10 neighborhoods in NYC with the most residential units. We can see `r sum(nta_units$BoroName == "Manhattan")` out of 10 neighborhoods are located in the `r knitr::combine_words(unique(nta_units$BoroName))` borough.  
+
+`r nta_units$NTAName[1]` is the neighborhood with the most residential units totaling: `r scales::comma(nta_units$res_units[1])`. This neighborhood has tall buildings so this can be the reason it has more population density.
+
+#### Where is NYC most crowded?
+(Which NYC census tract has the highest population density, measured as population per square foot of residential space? Do your answers change if you measure by population per residential unit?)
+
+```{r}
+density <- tracts_full |>
+  st_drop_geometry() |>
+  filter(res_units >= 50, res_area > 0, totalE > 0) |>
+  mutate(
+    pop_per_1k_sqft = totalE / res_area * 1000,
+    pop_per_unit    = totalE / res_units
+  )
+
+top_sqft <- density |> slice_max(pop_per_1k_sqft, n = 5) |>
+  mutate(measure = "Ranked by people per 1,000 sq ft")
+top_unit <- density |> slice_max(pop_per_unit, n = 5) |>
+  mutate(measure = "Ranked by people per unit")
+
+bind_rows(top_sqft, top_unit) |>
+  select(measure, GEOID, NTAName, BoroName, totalE,
+         pop_per_1k_sqft, pop_per_unit) |>
+  gt(groupname_col = "measure") |>
+  tab_header(
+    title = "NYC's Most Densely Populated Census Tracts",
+    subtitle = "Two ways of measuring residential crowding"
+  ) |>
+  cols_label(
+    GEOID = "Tract ID", NTAName = "Neighborhood", BoroName = "Borough",
+    totalE = "Population",
+    pop_per_1k_sqft = "People per 1,000 sq ft",
+    pop_per_unit = "People per unit"
+  ) |>
+  fmt_number(totalE, decimals = 0) |>
+  fmt_number(c(pop_per_1k_sqft, pop_per_unit), decimals = 2) |>
+  data_color(columns = c(pop_per_1k_sqft, pop_per_unit), palette = "Oranges") |>
+  tab_source_note("Source: ACS 2020–2024 5-year; NYC PLUTO. Tracts with fewer than 50 residential units excluded.")
+```
+Above you can see the most densely populated census tract table is divided in two, the top is calculating the tracts ranked by people per 1,000 sq ft, and the bottom part is ranked by people per unit. 
+
+The neighborhood `r top_sqft$NTAName[1]` in the borough `r top_sqft$BoroName[1]` is the most dense tract with `r round(top_sqft$pop_per_1k_sqft[1], 2)` people per 1,000 sq ft, it is also the most dense in the bottom table with `r round(top_unit$pop_per_unit[1], 2)` people per unit.  
+
+The neighborhoods and boroughs may vary between both tables because the top one is measuring population density per 1,000 sq ft: very small units that can hold more people in the same area. And the bottom table is measuring people by units, since there may be large families in apartments, both contributing to population density. Keeping both tables gives a better insight of the type of buildings in the area and how many people live there. (For this analysis any tracts with under 50 units were excluded.)
+
+
+### Colombian-Americans Across the US
+
+#### Where else do Colombians concentrate?
+(What 5 metro areas, other than NYC, have the largest share of population that identify with your ancestry of interest?)
+
+```{r}
+cbsa_share <- cbsa |>
+  st_drop_geometry() |>
+  filter(str_detect(NAME, "Metro Area"),   # metro areas only, no micro areas
+         GEOID != "35620") |>              # 35620 = New York metro
+  mutate(pct_colombian = colombianE / totalE) |>
+  slice_max(pct_colombian, n = 5)
+
+cbsa_share |>
+  select(NAME, totalE, colombianE, pct_colombian) |>
+  gt() |>
+  tab_header(
+    title = "Metro Areas with the Highest Share of Colombian-Americans",
+    subtitle = "Excluding the New York metro area"
+  ) |>
+  cols_label(
+    NAME = "Metro Area", totalE = "Total Population",
+    colombianE = "Colombian-Americans", pct_colombian = "Share Colombian"
+  ) |>
+  fmt_number(c(totalE, colombianE), decimals = 0) |>
+  fmt_percent(pct_colombian, decimals = 1) |>
+  data_color(columns = pct_colombian, palette = "YlOrRd") |>
+  tab_source_note("Source: ACS 2020–2024 5-year, table B03001")
+```
+
+EXPLAIN HERE
+
+
+#### A closer look at one city
+(At a not-too-granular level, describe the distribution of ancestries in a large non-NYC city of your choosing from the previous question.)
+
+```{r}
+# Pick the most populous metro from the Q4 top 5
+focus <- cbsa_share |> slice_max(totalE, n = 1)
+
+origin_file <- file.path("data", "mp03", "cbsa_hispanic_origin.csv")
+
+if (!file.exists(origin_file)) {
+  origin_raw <- get_acs(
+    geography = "cbsa",
+    variables = c(
+      total = "B03001_001", not_hispanic = "B03001_002",
+      mexican = "B03001_004", puerto_rican = "B03001_005",
+      cuban = "B03001_006", dominican = "B03001_007",
+      central_american = "B03001_008", south_american = "B03001_016",
+      colombian = "B03001_020", other_hispanic = "B03001_027"
+    ),
+    year = 2024,
+    survey = "acs5"
+  )
+  write_csv(origin_raw, origin_file)
+}
+
+origin <- read_csv(origin_file, col_types = cols(GEOID = "c"))
+
+city_mix <- origin |>
+  filter(GEOID == focus$GEOID) |>
+  select(variable, estimate) |>
+  pivot_wider(names_from = variable, values_from = estimate) |>
+  mutate(other_south_american = south_american - colombian) |>
+  select(-south_american) |>
+  pivot_longer(-total, names_to = "group", values_to = "pop") |>
+  mutate(
+    share = pop / total,
+    group = str_to_title(str_replace_all(group, "_", " "))
+  )
+
+ggplot(city_mix, aes(x = share, y = fct_reorder(group, share),
+                     fill = group == "Colombian")) +
+  geom_col(show.legend = FALSE) +
+  geom_text(aes(label = scales::percent(share, accuracy = 0.1)),
+            hjust = -0.1, size = 3.5) +
+  scale_x_continuous(labels = scales::percent,
+                     expand = expansion(mult = c(0, 0.15))) +
+    scale_fill_manual(values = c("grey70", col_blue)) +
+  labs(
+    title = paste("Who lives in the", str_remove(focus$NAME, " Metro Area"), "area?"),
+    subtitle = "Share of residents by Hispanic origin · Colombian highlighted",
+    x = "Share of metro population", y = NULL,
+    caption = "Source: ACS 2020–2024 5-year, table B03001"
+  ) +
+  theme_minimal() +
+  theme(plot.title.position = "plot")
+```
+
+EXPLAIN HERE
+
+
+#### How concentrated are Colombian-Americans?
+(As a percentage of all US residents who identify with your ancestry of interest, how many live in NY and how many live in other major metro areas?)
+
+```{r}
+us_file <- file.path("data", "mp03", "us_colombian.csv")
+
+if (!file.exists(us_file)) {
+  us_raw <- get_acs(
+    geography = "us",
+    variables = c(colombian = "B03001_020"),
+    year = 2024,
+    survey = "acs5",
+    output = "wide"
+  )
+  write_csv(us_raw, us_file)
+}
+
+us_colombian <- read_csv(us_file)$colombianE
+
+metro_share <- cbsa |>
+  st_drop_geometry() |>
+  mutate(share_of_us = colombianE / us_colombian) |>
+  slice_max(colombianE, n = 10) |>
+  mutate(cum_share = cumsum(share_of_us))
+
+nyc_share <- metro_share$share_of_us[metro_share$GEOID == "35620"]
+
+metro_share |>
+  select(NAME, colombianE, share_of_us, cum_share) |>
+  gt() |>
+  tab_header(
+    title = "Where Do Colombian-Americans Live?",
+    subtitle = "Top 10 metro areas by Colombian-American population"
+  ) |>
+  cols_label(
+    NAME = "Metro Area", colombianE = "Colombian-Americans",
+    share_of_us = "Share of US Total", cum_share = "Cumulative Share"
+  ) |>
+  fmt_number(colombianE, decimals = 0) |>
+  fmt_percent(c(share_of_us, cum_share), decimals = 1) |>
+  data_color(columns = share_of_us, palette = "Greens") |>
+  tab_source_note("Source: ACS 2020–2024 5-year, table B03001")
+```
+EXPLAIN HERE
+
+### Population and Housing
+
+#### Do more homes mean more people?
+(Do we observe a roughly linear relationship between population and housing (units or area) across NYC tracts or is the relationship more complex?)
+
+```{r}
+cor_units <- cor(density$res_units, density$totalE)
+cor_area  <- cor(density$res_area, density$totalE)
+
+ggplot(density, aes(x = res_units, y = totalE)) +
+  geom_point(aes(color = BoroName), alpha = 0.4, size = 1) +
+  geom_smooth(method = "lm", se = FALSE, color = "black") +
+  geom_smooth(method = "loess", se = FALSE, color = "red", linetype = "dashed") +
+  scale_x_continuous(labels = scales::comma) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(
+    title = "Population vs. Housing Units Across NYC Census Tracts",
+    subtitle = "Black = straight-line fit · Red dashed = flexible (loess) fit",
+    x = "Residential units", y = "Population", color = "Borough",
+    caption = "Source: ACS 2020–2024 5-year; NYC PLUTO"
+  ) +
+  theme_minimal() +
+  theme(plot.title.position = "plot")
+```
+
+EXPLAIN HERE
+
+#### Where are the tallest buildings?
+(What are the NTAs with highest buildings? (You can use PLUTO's numfloors variable as a measure of height.))
+
+```{r}
+# Give each PLUTO lot its tract GEOID and neighborhood
+pluto_nta <- pluto |>
+  filter(!is.na(bct2020), numfloors > 0) |>
+  mutate(GEOID = paste0("36", unname(boro_fips[str_sub(bct2020, 1, 1)]),
+                        str_sub(bct2020, 2, 7))) |>
+  inner_join(tract_nta |> st_drop_geometry() |>
+               select(GEOID, NTA2020, NTAName, BoroName),
+             by = "GEOID")
+
+tallest <- pluto_nta |>
+  group_by(NTAName, BoroName) |>
+  summarize(
+    avg_floors  = mean(numfloors),
+    max_floors  = max(numfloors),
+    pct_20plus  = mean(numfloors >= 20),
+    n_buildings = n(),
+    .groups = "drop"
+  ) |>
+  slice_max(avg_floors, n = 10)
+
+tallest |>
+  gt() |>
+  tab_header(
+    title = "NYC's Tallest Neighborhoods",
+    subtitle = "Ranked by average number of floors per building"
+  ) |>
+  cols_label(
+    NTAName = "Neighborhood", BoroName = "Borough",
+    avg_floors = "Avg. Floors", max_floors = "Tallest (floors)",
+    pct_20plus = "Share 20+ Floors", n_buildings = "Buildings"
+  ) |>
+  fmt_number(avg_floors, decimals = 1) |>
+  fmt_number(c(max_floors, n_buildings), decimals = 0) |>
+  fmt_percent(pct_20plus, decimals = 0) |>
+  data_color(columns = avg_floors, palette = "Purples") |>
+  tab_source_note("Source: NYC PLUTO. Lots with no recorded floors excluded.")
+```
+
+EXPLAIN HERE
+
+#### Mapping density across the city
+(Visualize how population density varies across NYC?)
+
+```{r}
+nta_density <- tracts_full |>
+  st_drop_geometry() |>
+  group_by(NTA2020) |>
+  summarize(pop = sum(totalE, na.rm = TRUE),
+            res_area = sum(res_area, na.rm = TRUE), .groups = "drop") |>
+  mutate(pop_per_1k_sqft = if_else(res_area > 0, pop / res_area * 1000, NA_real_))
+
+density_map <- nyc_nta |>
+  left_join(nta_density, by = "NTA2020") |>
+  mutate(pop_per_1k_sqft = if_else(NTAType == "0", pop_per_1k_sqft, NA_real_))  # parks, airports etc. → grey
+
+p_density <- ggplot(density_map) +
+  geom_sf_interactive(
+    aes(fill = pop_per_1k_sqft,
+        tooltip = paste0(NTAName, " (", BoroName, ")\n",
+                         round(pop_per_1k_sqft, 2), " people per 1,000 sq ft"),
+        data_id = NTA2020),
+    color = "white", linewidth = 0.1
+  ) +
+  scale_fill_viridis_c(option = "magma", direction = -1, na.value = "grey85",
+                       name = "People per\n1,000 sq ft") +
+  labs(
+    title = "Residential Population Density Across NYC Neighborhoods",
+    subtitle = "Residents per 1,000 sq ft of residential floor area · grey = parks, airports, cemeteries",
+    caption = "Source: ACS 2020–2024 5-year; NYC PLUTO; NYC DCP NTAs"
+  ) +
+  theme_void() +
+  theme(plot.title.position = "plot")
+
+girafe(ggobj = p_density, width_svg = 8, height_svg = 8,
+       options = list(opts_sizing(rescale = TRUE)))
+```
+EXPLAIN HERE
+
+#### Who lives in commercial areas?
+(How many New Yorkers live in areas that could be described as 'primarily commercial'?)
+
+```{r}
+# Definition: a tract is "primarily commercial" when commercial floor area
+# is more than a given share of all building floor area
+commercial <- tracts_full |>
+  st_drop_geometry() |>
+  filter(bldg_area > 0) |>
+  mutate(com_share = com_area / bldg_area)
+
+nyc_pop <- sum(tracts_full$totalE, na.rm = TRUE)
+
+threshold_tbl <- tibble(threshold = c(0.5, 0.6, 0.75)) |>
+  mutate(
+    tracts    = map_int(threshold, ~ sum(commercial$com_share > .x)),
+    residents = map_dbl(threshold, ~ sum(commercial$totalE[commercial$com_share > .x])),
+    pct_nyc   = residents / nyc_pop
+  )
+
+pop_commercial <- threshold_tbl$residents[threshold_tbl$threshold == 0.5]
+
+threshold_tbl |>
+  gt() |>
+  tab_header(
+    title = "New Yorkers Living in Primarily Commercial Tracts",
+    subtitle = "How the answer changes with the definition of 'primarily commercial'"
+  ) |>
+  cols_label(
+    threshold = "Commercial share of floor area above",
+    tracts = "Tracts", residents = "Residents", pct_nyc = "Share of NYC"
+  ) |>
+  fmt_percent(threshold, decimals = 0) |>
+  fmt_number(c(tracts, residents), decimals = 0) |>
+  fmt_percent(pct_nyc, decimals = 1) |>
+  tab_source_note("Source: ACS 2020–2024 5-year; NYC PLUTO (comarea / bldgarea)")
+```
+
+
+------------------------------------------------
+
+## Atlas of Communities Entry: Colombian-Americans 🇨🇴
+
+
+
+Final Deliverable: 
+Now that your data is fully prepared, it’s time to write your entry for Welcomed by the New Colossus. Write an overview and brief story about “X”-Americans, discussing where they live in NYC and where they can be found throughout the US. Your write up should include at least 4 numerical facts and two maps of your choosing. (These can be, but are not required to be, related to the EDA performed above.) Make sure to include relevant historical context as well. This should be at least 300 words, but you can use more if you have more information to add.
+
+TipTask 7: Atlas of American Communities Entry
+Write up your entry for the Atlas of American Communities. It should contain (at least) the items noted above, but you can have as much fun with this and go as deep into the subject as you want.
+
+## AI Usage Statement
+
+::: {.callout-note title="AI Usage Statement" collapse="true"}
+
+I used Claude by Anthropic and Gemini to help me understand concepts and tools in depth and complete the R code. They also helped to fix errors, provide improvement suggestions, and point out spelling mistakes throughout the project.The report was written by me.
+:::

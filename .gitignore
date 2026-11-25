@@ -8,7 +8,6 @@ data/**
 **/*csv*
 **/*xlsx*
 **/*zip
-**/*pdf
 **/*json
 **/*rds
 .DS_Store
@@ -19,3 +18,4 @@ data/**
 **/*bspf
 /.quarto/
 **/*.quarto_ipynb
+.RData
