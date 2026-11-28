@@ -11,6 +11,12 @@ execute:
 
 ## Introduction
 
+Welcome to ***Welcomed by the New Colossus: An Atlas of American Communities***.  This is Isabela Carvajal Rios, and I will be showing you a few curious facts about the American Communities that live in the USA, and especially Colombian-Americans. 
+
+Everybody knows United States of America is known as the land of dreams and opportunities, and as a Colombian myself, I will explain more in detail about my people in this country and where they reside. This edition will also cover NYC buildings, the density of the population here, the American community diversity in the country, and a bit of history. 
+
+To make this possible, the data used was sourced from the Census (ACS), NYC neighborhood maps, and PLUTO (Primary Land Use Tax Lot Output). 
+
 ```{r}
 library(tidyverse)
 library(tidycensus)
@@ -53,6 +59,9 @@ cbsa <- read_sf(cbsa_file)
 
 ### NYC Census Tracts
 
+A tract is a small area that the Census uses to collect data, and each tract is between 1,200 to 8,000 people. So when tracts are mentioned, they refer to small areas of a city. 
+I downloaded the total population and the Colombian-American population for every tract in the 5 boroughs (including the map shapes).
+
 ```{r}
 tract_file <- file.path("data", "mp03", "nyc_tracts_colombian.shp")
 
@@ -72,6 +81,10 @@ if (!file.exists(tract_file)) {
 
 nyc_tracts <- read_sf(tract_file)
 ```
+
+### NYC Neighborhoods (NTAs)
+
+NTA's are the New York City's official neighborhoods, this data is collected by the Department of City Planning and it includes all the names. I downloaded the zip file from NYC Planning.
 
 ```{r}
 load_nyc_nta <- function() {
@@ -95,7 +108,6 @@ load_nyc_nta <- function() {
 }
 
 nyc_nta <- load_nyc_nta()
-nyc_nta
 ```
 
 ### Aggregating Tracts to Neighborhoods
@@ -122,8 +134,6 @@ nta_pop <- tract_nta |>
 # 4. Reconnect to the NTA shapes
 nyc_nta_pop <- nyc_nta |>
   left_join(nta_pop, by = "NTA2020")
-
-nyc_nta_pop |> arrange(desc(colombian))
 ```
 
 ### NYC Buildings (PLUTO)
@@ -264,7 +274,7 @@ girafe(ggobj = p_units, width_svg = 9, height_svg = 5,
 ```
 The chart above gives us a visual on the top 10 neighborhoods in NYC with the most residential units. We can see `r sum(nta_units$BoroName == "Manhattan")` out of 10 neighborhoods are located in the `r knitr::combine_words(unique(nta_units$BoroName))` borough.  
 
-`r nta_units$NTAName[1]` is the neighborhood with the most residential units totaling: `r scales::comma(nta_units$res_units[1])`. This neighborhood has tall buildings so this can be the reason it has more population density.
+`r nta_units$NTAName[1]` is the neighborhood with the most residential units totaling: `r scales::comma(nta_units$res_units[1])`. This neighborhood has tall buildings so there are many units on the same piece of land one on top of each other, using less territory.
 
 #### Where is NYC most crowded?
 (Which NYC census tract has the highest population density, measured as population per square foot of residential space? Do your answers change if you measure by population per residential unit?)
@@ -339,11 +349,13 @@ cbsa_share |>
   tab_source_note("Source: ACS 2020–2024 5-year, table B03001")
 ```
 
-EXPLAIN HERE
+In the table above we can see the metro areas in the USA with the highest share of Colombian Americans (Colombian immigrants, US- born children and grand children that identify as Colombian, since the census is self reported). This table excludes the New York metro area.
+
+The metro area that have the highest share of Colombian- Americans is `r cbsa_share$NAME[1]`, it holds  `r scales::comma(cbsa_share$colombianE[1])` Colmbian-American people, and a share of `r scales::percent(cbsa_share$pct_colombian[1], accuracy = 0.1)`. In the state of Florida only there are `r sum(str_detect(cbsa_share$NAME, ", FL"))` of the top 5 metros.
 
 
 #### A closer look at one city
-(At a not-too-granular level, describe the distribution of ancestries in a large non-NYC city of your choosing from the previous question.)
+(The distribution of ancestries in a large non-NYC city of Miami-Fort Lauderdale- West Palm Beach area.)
 
 ```{r}
 # Pick the most populous metro from the Q4 top 5
@@ -399,11 +411,12 @@ ggplot(city_mix, aes(x = share, y = fct_reorder(group, share),
   theme(plot.title.position = "plot")
 ```
 
-EXPLAIN HERE
+In the chart above we can see the breakdown of who lives in the Miami-Fort Lauderdale- West Palm Beach area. When added up, `r scales::percent(1 - city_mix$share[city_mix$group == "Not Hispanic"], accuracy = 0.1)` of the population is Hispanic. 
 
+The largest Hispanic group is the Cuban with `r scales::percent(city_mix$share[city_mix$group == "Cuban"], accuracy = 0.1)` of the population. Colombian is the second largest single country group with a share of `r scales::percent(city_mix$share[city_mix$group == "Colombian"], accuracy = 0.1)` of the population. The reason Cuban population is the highest group is due to the Cuban migration that took place after the 1959 Cuban Revolution  ([Wikipedia](https://en.wikipedia.org/wiki/Cuban_migration_to_Miami)).
 
 #### How concentrated are Colombian-Americans?
-(As a percentage of all US residents who identify with your ancestry of interest, how many live in NY and how many live in other major metro areas?)
+(As a percentage of all US residents who identify as Colombian- American, how many live in NY and how many live in other major metro areas)
 
 ```{r}
 us_file <- file.path("data", "mp03", "us_colombian.csv")
@@ -419,7 +432,7 @@ if (!file.exists(us_file)) {
   write_csv(us_raw, us_file)
 }
 
-us_colombian <- read_csv(us_file)$colombianE
+us_colombian <- read_csv(us_file, show_col_types = FALSE)$colombianE
 
 metro_share <- cbsa |>
   st_drop_geometry() |>
@@ -445,7 +458,11 @@ metro_share |>
   data_color(columns = share_of_us, palette = "Greens") |>
   tab_source_note("Source: ACS 2020–2024 5-year, table B03001")
 ```
-EXPLAIN HERE
+
+In the table above we can see both New York-Newark-Jersey City, NY-NJ Metro Area and Miami-Fort Lauderdale-West Palm Beach, FL Metro Area are almost tied, and together they hold `r scales::percent(metro_share$cum_share[2], accuracy = 0.1)` of the share of Colombian-Americans in the US. So we can conclude that over a third of the people who consider themselves as Colombian-Americans are more concentrated in NJ/NY and Miami. And almost half is concentrated in NJ/Ny and Florida's three metros with `r scales::percent(nyc_share + sum(metro_share$share_of_us[str_detect(metro_share$NAME, ", FL")]), accuracy = 0.1)`. 
+
+The top 10 metros in the table hold about `r scales::percent(max(metro_share$cum_share), accuracy = 0.1)` of the Colombian-Americans. And if we compare Florida to New York we can see Florida's three largest metros are the home to more Colombian-Americans with `r scales::comma(sum(metro_share$colombianE[str_detect(metro_share$NAME, ", FL")]))` Colombians, vs New York with `r scales::comma(metro_share$colombianE[metro_share$GEOID == "35620"])` Colombians.
+
 
 ### Population and Housing
 
@@ -458,8 +475,8 @@ cor_area  <- cor(density$res_area, density$totalE)
 
 ggplot(density, aes(x = res_units, y = totalE)) +
   geom_point(aes(color = BoroName), alpha = 0.4, size = 1) +
-  geom_smooth(method = "lm", se = FALSE, color = "black") +
-  geom_smooth(method = "loess", se = FALSE, color = "red", linetype = "dashed") +
+    geom_smooth(method = "lm", formula = y ~ x, se = FALSE, color = "black") +
+  geom_smooth(method = "loess", formula = y ~ x, se = FALSE, color = "red", linetype = "dashed") +
   scale_x_continuous(labels = scales::comma) +
   scale_y_continuous(labels = scales::comma) +
   labs(
@@ -472,10 +489,14 @@ ggplot(density, aes(x = res_units, y = totalE)) +
   theme(plot.title.position = "plot")
 ```
 
-EXPLAIN HERE
+
+In the scatter plot above we can visualize the amount of residential units and the population. The black line shows the straight line fit and the red line bends to follow the data we have. 
+
+We can see that up to the 4000 residential units the relationship is fairly linear, and after the 5000 units the red line starts to bend down.This tells us that up to the 4000 units more homes are equivalent to more people, and after the 5000 units, more units have less people than the black line had anticipated (even though after 6000 units the red curve is relying on few points only). The correlation between units and population is `r round(cor_units, 2)`, and this number shows us the data correlation is strong. When comparing population with residential are we get `r round(cor_area, 2)`, which is almost the same as the correlation between units and population, both telling us that if there are more homes there are more people. 
+
 
 #### Where are the tallest buildings?
-(What are the NTAs with highest buildings? (You can use PLUTO's numfloors variable as a measure of height.))
+(The NTA's with highest buildings) 
 
 ```{r}
 # Give each PLUTO lot its tract GEOID and neighborhood
@@ -496,6 +517,7 @@ tallest <- pluto_nta |>
     n_buildings = n(),
     .groups = "drop"
   ) |>
+  filter(n_buildings >= 50) |>
   slice_max(avg_floors, n = 10)
 
 tallest |>
@@ -516,10 +538,12 @@ tallest |>
   tab_source_note("Source: NYC PLUTO. Lots with no recorded floors excluded.")
 ```
 
-EXPLAIN HERE
+In the table above we can see that New York City's top 10 tallest neighborhoods `r sum(tallest$BoroName == "Manhattan")` of 10 are in `r knitr::combine_words(unique(tallest$BoroName))` The tallest neighborhood is `r tallest$NTAName[1]` with an average of `r round(tallest$avg_floors[1], 1)` floors, and the tenth tallest neighborhood is a lot shorter with an average of `r round(tallest$avg_floors[10], 1)` floors, less than half (`r scales::percent(tallest$avg_floors[10] / tallest$avg_floors[1], accuracy = 1)`). 
+
+Fidi and Midtown have the tallest buildings with `r tallest$max_floors[1]` floors on the tallest in Fidi and `r tallest$max_floors[tallest$NTAName == "Midtown South-Flatiron-Union Square"]` floors in Midtown South-Flatiron-Union Square, but they have an average of `r round(tallest$avg_floors[1], 1)` and `r round(tallest$avg_floors[tallest$NTAName == "Midtown South-Flatiron-Union Square"], 1)` floors because the rest of the buildings in the area are not so tall. Both of this areas are office districts. In this table I excluded neighborhoods with less than 50 buildings so that the data was showing the reality of an area and not only a tall building in an area with few buildings where the averages could appear inflated.
 
 #### Mapping density across the city
-(Visualize how population density varies across NYC?)
+(How population density varies across NYC)
 
 ```{r}
 nta_density <- tracts_full |>
@@ -554,10 +578,15 @@ p_density <- ggplot(density_map) +
 girafe(ggobj = p_density, width_svg = 8, height_svg = 8,
        options = list(opts_sizing(rescale = TRUE)))
 ```
-EXPLAIN HERE
+
+In the map above we can see the neighborhoods with more residents per 1000 sq ft are a darker color than the areas with less residents density. Surprisingly Manhattan is light colors which reflect there is low density there (even if it has the highest buildings), compared to `r density_map$BoroName[which.max(density_map$pop_per_1k_sqft)]` where there central part of the map is highlighted in darker tones. Brooklyn is also highlighted in darker colors as well. 
+
+After hovering over the map we can see the location with the most resident density is `r density_map$NTAName[which.max(density_map$pop_per_1k_sqft)]` in `r density_map$BoroName[which.max(density_map$pop_per_1k_sqft)]` with `r round(max(density_map$pop_per_1k_sqft, na.rm = TRUE), 2)` people per 1000 square feet. 
+
+Circling back to the data analyzed in previous sections, the densest neighborhood is also in the middle of where the highest concentration of Colombian-Americans are in Queens. 
 
 #### Who lives in commercial areas?
-(How many New Yorkers live in areas that could be described as 'primarily commercial'?)
+(How many New Yorkers live in areas that could be described as 'primarily commercial')
 
 ```{r}
 # Definition: a tract is "primarily commercial" when commercial floor area
@@ -594,22 +623,110 @@ threshold_tbl |>
   tab_source_note("Source: ACS 2020–2024 5-year; NYC PLUTO (comarea / bldgarea)")
 ```
 
+In the table above we can see the amount of New Yorker's living in primary commercial tracts. The table also shows data for 3 different angles, depending on what the reader considers as 'primarily commercial'.
 
-------------------------------------------------
+For the first example I am considering 'primarily commercial' if more than `r scales::percent(threshold_tbl$threshold[1])` of the floor area is commercial. The data shows that around `r scales::percent(threshold_tbl$pct_nyc[1], accuracy = 0.1)` of New Yorker's live in primarily commercial tracts, with a total of about `r scales::comma(pop_commercial)` people and `r threshold_tbl$tracts[1]` tracts. 
+
+If we consider 'primarily commercial' when more than `r scales::percent(threshold_tbl$threshold[3])` of the share is commercial, then there would be `r scales::percent(threshold_tbl$pct_nyc[3], accuracy = 0.1)` of New Yorker's living in these areas, with `r scales::comma(threshold_tbl$residents[3])` residents and `r threshold_tbl$tracts[3]` tracts.
+
 
 ## Atlas of Communities Entry: Colombian-Americans 🇨🇴
 
+Colombians started migrating to the United States of America in the 1950's, after the civil war in Colombia. Many people left the country because the quality of life was not the best, there was a lot of poverty, and there was an Act passed in 1965 that made it easier for Colombians to move here and start again. Then between the 1980's and 1990's many more Colombians left Colombia to escape from the violence and drug dealing era.
 
+During the 1970's many Colombians that moved to the USA decided to settle in Jackson Heights in Queens and during the 1980's many Colombians settled in Miami. ([Wikipedia](https://en.wikipedia.org/wiki/Colombian_Americans))
 
-Final Deliverable: 
-Now that your data is fully prepared, it’s time to write your entry for Welcomed by the New Colossus. Write an overview and brief story about “X”-Americans, discussing where they live in NYC and where they can be found throughout the US. Your write up should include at least 4 numerical facts and two maps of your choosing. (These can be, but are not required to be, related to the EDA performed above.) Make sure to include relevant historical context as well. This should be at least 300 words, but you can use more if you have more information to add.
+Colombian-Americans are all the people that consider themselves or identify as Colombian immigrants, US- born children and grand children, since the census is self reported.
+But where do Colombian- Americans live now? Please take a look at the following map:
 
-TipTask 7: Atlas of American Communities Entry
-Write up your entry for the Atlas of American Communities. It should contain (at least) the items noted above, but you can have as much fun with this and go as deep into the subject as you want.
+### Colombian America
+```{r}
+us_metros <- cbsa |>
+  filter(str_detect(NAME, "Metro Area")) |>
+  mutate(pct_colombian = colombianE / totalE) |>
+  tigris::shift_geometry()   # moves Alaska, Hawaii, Puerto Rico under the mainland
+
+p_us <- ggplot(us_metros) +
+  geom_sf_interactive(
+    aes(fill = pct_colombian,
+        tooltip = paste0(str_remove(NAME, " Metro Area"), "\n",
+                         scales::comma(colombianE), " Colombian-Americans (",
+                         scales::percent(pct_colombian, accuracy = 0.1), ")"),
+        data_id = GEOID),
+    color = "white", linewidth = 0.05
+  ) +
+  scale_fill_gradient(low = col_yellow, high = col_red, transform = "sqrt",
+                      labels = scales::percent, name = "Share\nColombian") +
+  labs(
+    title = "Colombian-Americans Across US Metro Areas",
+    subtitle = "Share of metro population identifying as Colombian · hover for details",
+    caption = "Source: ACS 2020–2024 5-year, table B03001"
+  ) +
+  theme_void() +
+  theme(plot.title.position = "plot")
+
+girafe(ggobj = p_us, width_svg = 10, height_svg = 6,
+       options = list(opts_sizing(rescale = TRUE)))
+```
+
+The USA has a total of `r scales::comma(us_colombian)` Colombians. We can see that there are two main areas in the map with high shares of Colombians, they are noticeably darker shades of orange and almost red located in the Miami area with a share of `r scales::percent(cbsa_share$pct_colombian[1], accuracy = 0.1)` of it's population, and new york area is home to `r scales::percent(nyc_share, accuracy = 0.1)` of all the Colombian-Americans in the USA. Most Colombians are located in the East coast, and the rest of the country has very few Colombian-Americans in relation with the two areas mentioned.
+
+### Colombian New York
+
+Now let's take a look at the Colombians in New York in the map below:
+
+```{r}
+col_nta <- nyc_nta_pop |>
+  mutate(pct_colombian = if_else(NTAType == "0", pct_colombian, NA_real_))
+
+top_col_nta <- col_nta |>
+  st_drop_geometry() |>
+  slice_max(colombian, n = 10)
+
+p_col_map <- ggplot(col_nta) +
+  geom_sf_interactive(
+    aes(fill = pct_colombian,
+        tooltip = paste0(NTAName, "\n", scales::comma(colombian),
+                         " Colombian-Americans (",
+                         scales::percent(pct_colombian, accuracy = 0.1), ")"),
+        data_id = NTA2020),
+    color = "white", linewidth = 0.1
+  ) +
+  scale_fill_gradient(low = col_yellow, high = col_red, na.value = "grey90",
+                      labels = scales::percent, name = "Share\nColombian") +
+  theme_void()
+
+p_col_bar <- ggplot(top_col_nta,
+                    aes(x = colombian, y = fct_reorder(NTAName, colombian),
+                        tooltip = paste0(NTAName, ": ", scales::comma(colombian)),
+                        data_id = NTA2020)) +
+  geom_col_interactive(fill = col_blue) +
+  scale_x_continuous(labels = scales::comma) +
+  labs(x = "Colombian-Americans", y = NULL) +
+  theme_minimal()
+
+girafe(
+  ggobj = (p_col_map + p_col_bar + plot_layout(widths = c(1.4, 1))) +
+    plot_annotation(
+      title = "Where Colombian New Yorkers Live",
+      subtitle = "Share of residents by neighborhood · top 10 neighborhoods by count · hover to link panels",
+      caption = "Source: ACS 2020–2024 5-year, table B03001; NYC DCP NTAs"
+    ),
+  width_svg = 11, height_svg = 6,
+  options = list(opts_hover(css = "stroke:black;stroke-width:2px;"),
+                 opts_sizing(rescale = TRUE))
+)
+```
+In this map we can  visualize the map of NYC and also a bar chart of the top 10 neighborhoods with the most Colombian-Americans, and `r sum(top_col_nta$BoroName == "Queens")` of the top 10 are in Queens.
+
+We can see that the top New York neighborhood with the highest amount of Colombian-Americans is `r top_col_nta$NTAName[1]` with `r scales::comma(top_col_nta$colombian[1])` Colombians, equivalent to a share of `r scales::percent(top_col_nta$pct_colombian[1], accuracy = 0.1)` of the total Jackson Height's population. 
+ 
+To conclude, the New York Metro Area has the most amount of Colombian-Americans, but Miami has the highest concentration of them. Looking back on history, the main migration waves from the 1970's to NY, and in 1980's to Miami defined where Colombian-American people would live in the future, and we can see this clearly in the data analyzed here, because to this day over a third of them are still located in those two places. About `r scales::percent(max(metro_share$cum_share) - metro_share$cum_share[2], accuracy = 0.1)` are located in the top eight metros (after Miami and NY area): Orlando, Houston, Atlanta, Los Angeles, Washington DC, Tampa, Boston, and Chicago, and the rest of them (`r scales::percent(1 - max(metro_share$cum_share), accuracy = 0.1)`) are spread across the United states in smaller metropolitan areas. 
+
 
 ## AI Usage Statement
 
 ::: {.callout-note title="AI Usage Statement" collapse="true"}
 
-I used Claude by Anthropic and Gemini to help me understand concepts and tools in depth and complete the R code. They also helped to fix errors, provide improvement suggestions, and point out spelling mistakes throughout the project.The report was written by me.
+I used Claude by Anthropic and Gemini to help me understand concepts and tools in depth and complete the R code. They also helped to fix errors, provide improvement suggestions, and point out spelling mistakes throughout the project. The report was written by me.
 :::
