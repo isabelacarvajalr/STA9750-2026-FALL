@@ -138,6 +138,8 @@ nyc_nta_pop <- nyc_nta |>
 
 ### NYC Buildings (PLUTO)
 
+PLUTO (Primary Land Use Tax Lot Output) is NYC database that holds the information on every property lot, the units, the number of floors, and the floor area. I downloaded through the NYC Open Data API in pages of 50,000 and saved it locally. 
+
 ```{r}
 pluto_file <- file.path("data", "mp03", "pluto.csv")
 
@@ -316,7 +318,7 @@ Above you can see the most densely populated census tract table is divided in tw
 
 The neighborhood `r top_sqft$NTAName[1]` in the borough `r top_sqft$BoroName[1]` is the most dense tract with `r round(top_sqft$pop_per_1k_sqft[1], 2)` people per 1,000 sq ft, it is also the most dense in the bottom table with `r round(top_unit$pop_per_unit[1], 2)` people per unit.  
 
-The neighborhoods and boroughs may vary between both tables because the top one is measuring population density per 1,000 sq ft: very small units that can hold more people in the same area. And the bottom table is measuring people by units, since there may be large families in apartments, both contributing to population density. Keeping both tables gives a better insight of the type of buildings in the area and how many people live there. (For this analysis any tracts with under 50 units were excluded.)
+The neighborhoods and boroughs may vary between both tables because the top one is measuring population density per 1,000 sq ft: very small units that can hold more people in the same area. And the bottom table is measuring people by units, since there may be large families in apartments, both contributing to population density. Keeping both tables gives a better insight of the type of buildings in the area and how many people live there. (For this analysis any tracts with under 50 units were excluded).
 
 
 ### Colombian-Americans Across the US
