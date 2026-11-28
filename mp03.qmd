@@ -3,6 +3,7 @@ title: "Mini-Project #03: Where My People At?"
 format:
   html:
     code-fold: true
+    code-tools: true
     toc: true
 execute:
   warning: false
